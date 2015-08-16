@@ -2,4 +2,10 @@
 <resources>
     <string name="lable_total_cout">Total unique word in this group is %1$d</string>
     <string name="name_frequency">frequency  %1$d</string>
+
+
+    <string name="transition_view">trnsit</string>
+    <string name="square_orange_name">square_orange</string>
+
+
 </resources>

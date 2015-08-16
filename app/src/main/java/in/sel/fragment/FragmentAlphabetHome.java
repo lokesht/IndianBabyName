@@ -6,8 +6,10 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -102,39 +104,46 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
 
 
     @Override
-    public void onAlphaClickListener( View v, final M_AlphaCount mAlphaCount) {
+    public void onAlphaClickListener(final View v, final M_AlphaCount mAlphaCount) {
 
-        PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 5);
-        PropertyValuesHolder scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 5);
-        PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat(View.ALPHA, 0);
-
-        ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(v, scaleX, scaleY, alpha).setDuration(500);
-
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(anim);
-        animatorSet.start();
-
-        animatorSet.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
+//        PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 5);
+//        PropertyValuesHolder scaleY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 5);
+//        PropertyValuesHolder alpha = PropertyValuesHolder.ofFloat(View.ALPHA, 0);
+//
+//        ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(v, scaleX, scaleY, alpha).setDuration(500);
+//
+//        AnimatorSet animatorSet = new AnimatorSet();
+//        animatorSet.playTogether(anim);
+//        animatorSet.start();
+//
+//        animatorSet.addListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animation) {
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
                 Intent in = new Intent(getActivity(), ActivityDisplayName.class);
                 in.putExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET, mAlphaCount.getAlphabet());
-                getActivity().startActivity(in);
 
-                getActivity().overridePendingTransition(0, 0);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
+                View sharedView = v;
+                String transitionName = getString(R.string.square_orange_name);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity(), sharedView, transitionName);
+                    getActivity().startActivity(in, transitionActivityOptions.toBundle());
+                } else {
+                    getActivity().startActivity(in);
+                    getActivity().overridePendingTransition(0, 0);
+                }
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animation) {
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animation) {
+//            }
+//        });
     }
 }

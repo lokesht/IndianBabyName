@@ -1,85 +1,102 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:recyclerviewfastscroller="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <include
-        android:id="@+id/tb_app_bar"
-        layout="@layout/app_bar" />
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:visibility="invisible"
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvTotal"
-            android:textColor="@color/colorSecondaryText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:padding="@dimen/default_padding" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="@dimen/default_padding"
-            android:layout_marginRight="@dimen/default_padding"
-            android:background="@color/colorDivider" />
+        <include
+            android:id="@+id/tb_app_bar"
+            layout="@layout/app_bar" />
 
         <LinearLayout
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/margin_small"
-            android:weightSum="2">
+            android:background="@color/colorPrimary"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvEnglish"
-                android:textColor="@color/White"
-                android:layout_width="0dp"
+                android:id="@+id/tvTotal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:paddingLeft="50dp"
-                android:layout_weight="1"
-                android:text="English"
-                android:textSize="@dimen/ts_medium"
-                android:textStyle="bold" />
+                android:gravity="right"
+                android:padding="@dimen/default_padding"
+                android:textColor="@color/colorSecondaryText" />
 
-            <TextView
-                android:textColor="@color/White"
-                android:id="@+id/tvHindi"
-                android:layout_width="0dp"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="@dimen/default_padding"
+                android:layout_marginRight="@dimen/default_padding"
+                android:background="@color/colorDivider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:text="Marathi"
-                android:textSize="@dimen/ts_medium"
-                android:textStyle="bold" />
+                android:padding="@dimen/margin_small"
+                android:visibility="gone"
+                android:weightSum="2">
 
+                <TextView
+                    android:id="@+id/tvEnglish"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:paddingLeft="50dp"
+                    android:text="English"
+                    android:textColor="@color/White"
+                    android:textSize="@dimen/ts_medium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvHindi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:text="Marathi"
+                    android:textColor="@color/White"
+                    android:textSize="@dimen/ts_medium"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
         </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_frequency_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
+                android:id="@+id/fast_scroller"
+                android:layout_width="@dimen/scroll_width"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                recyclerviewfastscroller:rfs_handleBackground="@color/colorPrimary"
+                recyclerviewfastscroller:rfs_handleColor="@android:color/holo_red_dark" />
+
+        </FrameLayout>
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_frequency_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
-            android:id="@+id/fast_scroller"
-            android:layout_width="@dimen/scroll_width"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            recyclerviewfastscroller:rfs_handleBackground="@color/colorPrimary"
-            recyclerviewfastscroller:rfs_handleColor="@android:color/holo_red_dark" />
-
-    </FrameLayout>
-</LinearLayout>
+    <View
+        android:id="@+id/big_square_blue"
+        android:layout_margin="10dp"
+        android:transitionName="@string/square_orange_name"
+        android:layout_centerInParent="true"
+        android:background="@android:color/holo_orange_light"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/ic_launcher" />
+</FrameLayout>
