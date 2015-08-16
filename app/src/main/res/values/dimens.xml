@@ -1,0 +1,39 @@
+<resources>
+
+    <!-- Default screen margins,as per the Android Design guidelines. -->
+    <dimen name="activity_margin_horizontal">16dp</dimen>
+    <dimen name="activity_margin_vertical">16dp</dimen>
+
+    <!-- Default screen margins,as per the Android Design guidelines. -->
+    <dimen name="def_margin_horizontal">10dp</dimen>
+
+    <!-- Default Text size as per the Android Design guidelines -->
+    <dimen name="ts_micro">12sp</dimen>
+    <dimen name="ts_small">14sp</dimen>
+    <dimen name="ts_medium">18sp</dimen>
+    <dimen name="ts_large">22sp</dimen>
+
+    <!-- Customize Text size -->
+    <dimen name="ts_default">20sp</dimen>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="form_header_height">50dp</dimen>
+
+    <!-- Default Min height , For Spinner, TextView, EditText -->
+    <dimen name="def_min_height">48dp</dimen>
+
+    <!-- Circular Image Dimention -->
+    <dimen name="circular_imageview_width">100dp</dimen>
+    <dimen name="circular_imageview_height">100dp</dimen>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="drawer_width">280dp</dimen>
+    <dimen name="app_bar_top_padding">0dp</dimen>
+
+    <dimen name="scroll_width">30dp</dimen>
+    <dimen name="default_padding">8dp</dimen>
+
+</resources>

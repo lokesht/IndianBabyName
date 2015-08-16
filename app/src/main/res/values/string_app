@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lable_total_cout">Total unique word in this group is %1$d</string>
+    <string name="name_frequency">frequency  %1$d</string>
+</resources>
