@@ -3,18 +3,25 @@ package in.sel.indianbabyname;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewAnimationUtils;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +33,7 @@ import in.sel.dbhelper.TableContract;
 import in.sel.logging.AppLogger;
 import in.sel.model.M_Name;
 import in.sel.utility.AppConstants;
+import in.sel.utility.L;
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 /**
@@ -38,14 +46,18 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     private RecyclerView lsName;
     private Toolbar toolbar;
     /** */
-    public static String selectedAlphabet = "";
+    private static String selectedAlphabet = "";
 
     /** */
     private DBHelper dbHelper;
 
-    /** Parent View*/
+    /**
+     * Parent View
+     */
     private static final long ANIM_DURATION = 1000;
     private View bgViewGroup;
+
+    private CardView cardViewSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +134,8 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         Transition enterTransition = getWindow().getSharedElementEnterTransition();
         enterTransition.addListener(new Transition.TransitionListener() {
             @Override
-            public void onTransitionStart(Transition transition) {}
+            public void onTransitionStart(Transition transition) {
+            }
 
             @Override
             public void onTransitionEnd(Transition transition) {
@@ -130,13 +143,16 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
             }
 
             @Override
-            public void onTransitionCancel(Transition transition) {}
+            public void onTransitionCancel(Transition transition) {
+            }
 
             @Override
-            public void onTransitionPause(Transition transition) {}
+            public void onTransitionPause(Transition transition) {
+            }
 
             @Override
-            public void onTransitionResume(Transition transition) {}
+            public void onTransitionResume(Transition transition) {
+            }
         });
     }
 
@@ -154,16 +170,20 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
             }
 
             @Override
-            public void onTransitionEnd(Transition transition) {}
+            public void onTransitionEnd(Transition transition) {
+            }
 
             @Override
-            public void onTransitionCancel(Transition transition) {}
+            public void onTransitionCancel(Transition transition) {
+            }
 
             @Override
-            public void onTransitionPause(Transition transition) {}
+            public void onTransitionPause(Transition transition) {
+            }
 
             @Override
-            public void onTransitionResume(Transition transition) {}
+            public void onTransitionResume(Transition transition) {
+            }
         });
     }
 
@@ -207,7 +227,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
         NameRecycleViewAdapter na = new NameRecycleViewAdapter(this, name);
 
-       final VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);
+        final VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);
 
         /* Connect the recycler to the scroller (to let the scroller scroll the list)*/
         fastScroller.setRecyclerView(lsName);
@@ -317,13 +337,83 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+		/* Inflate the menu; this adds items to the action bar if it is present */
+        getMenuInflater().inflate(R.menu.menu_display_name, menu);
+        return true;
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+
+            case R.id.action_search:
+                cardViewSearch = (CardView) findViewById(R.id.cv_search);
+                showSearchBar(cardViewSearch);
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void onCollapseSearch(View view) {
+        hideSearchBar(cardViewSearch);
+    }
+
+    public void showSearchBar(View myView) {
+        showSearchBar(myView, 0, 0);
+    }
+
+    /**
+     * Animate to show Search bar
+     */
+    public void showSearchBar(View myView, int cx, int cy) {
+        // get the center for the clipping circle
+
+        if (cx == 0 || cy == 0) {
+            cx = (myView.getLeft() + myView.getRight());
+            cy = (myView.getTop() + myView.getBottom());
+        }
+
+        // get the final radius for the clipping circle
+        int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
+
+        // create the animator for this view (the start radius is zero)
+        Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
+
+        // make the view visible and start the animation
+        myView.setVisibility(View.VISIBLE);
+        anim.start();
+    }
+
+    /**
+     * Animate to show Search bar
+     */
+    public void hideSearchBar(final View myView) {
+        // get the center for the clipping circle
+
+        int cx = (myView.getLeft() + myView.getRight());
+        int cy = (myView.getTop() + myView.getBottom());
+
+        // get the final radius for the clipping circle
+        int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
+
+        // create the animator for this view (the start radius is zero)
+        Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, finalRadius, 0);
+
+        // make the view visible and start the animation
+
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                myView.setVisibility(View.INVISIBLE);
+            }
+        });
+        anim.start();
     }
 
     @Override
