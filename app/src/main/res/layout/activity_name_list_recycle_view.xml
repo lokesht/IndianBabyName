@@ -35,13 +35,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:background="?android:attr/selectableItemBackground"
                         android:onClick="onCollapseSearch"
                         android:paddingLeft="@dimen/default_padding"
                         android:paddingRight="@dimen/default_padding"
                         android:src="@mipmap/ic_arrow_back_black_24dp" />
 
                     <EditText
+                        android:id="@+id/et_search_box"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@null"
@@ -91,7 +92,6 @@
     </LinearLayout>
 
     <View
-
         android:id="@+id/big_square_blue"
         android:layout_width="80dp"
         android:layout_height="80dp"
@@ -100,4 +100,13 @@
         android:background="@drawable/circle_selector"
         android:elevation="7dp"
         android:transitionName="@string/square_orange_name" />
+
+    <View
+        android:id="@+id/view_cover_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:elevation="@dimen/default_padding"
+        android:translationZ="@dimen/default_padding"
+        android:visibility="invisible" />
 </FrameLayout>

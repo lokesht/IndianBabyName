@@ -75,8 +75,6 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
         AlphabetRecyclerViewAdapter adapter = new AlphabetRecyclerViewAdapter(getActivity(), array, this);
         rv.setAdapter(adapter);
 
-        if (AppConstants.DEBUG)
-            Log.e(TAG, "onActivityCreated");
     }
 
     /**

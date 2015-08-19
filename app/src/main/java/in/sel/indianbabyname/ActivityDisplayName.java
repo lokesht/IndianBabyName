@@ -2,6 +2,8 @@ package in.sel.indianbabyname;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +14,8 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.transition.Transition;
 import android.util.Log;
 import android.view.Menu;
@@ -20,6 +24,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +38,7 @@ import in.sel.adapter.NameRecycleViewAdapter;
 import in.sel.customview.CustomDividerItemDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
+import in.sel.framework.SimpleAnimationListener;
 import in.sel.logging.AppLogger;
 import in.sel.model.M_Name;
 import in.sel.utility.AppConstants;
@@ -56,11 +65,24 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
      */
     private static final long ANIM_DURATION = 1000;
     private View bgViewGroup;
+    private View viewContainer;
 
     private CardView cardViewSearch;
 
-    int centerX;
-    int centerY;
+    private int centerX;
+    private int centerY;
+
+    /**
+     * Search Edit Box Edit
+     */
+    private EditText editText;
+    private NameRecycleViewAdapter nameRecycleViewAdapter;
+
+    private boolean isSearchOpen = false;
+
+    final static AccelerateInterpolator ACCELERATE = new AccelerateInterpolator();
+    final static AccelerateDecelerateInterpolator ACCELERATE_DECELERATE = new AccelerateDecelerateInterpolator();
+    final static DecelerateInterpolator DECELERATE = new DecelerateInterpolator();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +94,10 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        String text = "You click at x = " + event.getX() + " and y = " + event.getY();
+        centerX = (int) event.getX();
+        centerY = (int) event.getY();
 
-        centerX = (int)event.getX();
-        centerY = (int)event.getY();
-        Toast.makeText(this, centerX+" "+centerY, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, centerX + " " + centerY, Toast.LENGTH_LONG).show();
 
         return super.dispatchTouchEvent(event);
     }
@@ -136,10 +157,41 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
                 c.close();
         }
 
+        /** Implement Text Watcher*/
+        onSearchListener();
+    }
+
+    public void onSearchListener() {
+        editText = (EditText) findViewById(R.id.et_search_box);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                query(s.toString());
+            }
+        });
+    }
+
+    private void query(String finding) {
+        if (finding.length() > 0) {
+            nameRecycleViewAdapter.setFilter(finding.toLowerCase());
+        } else {
+            nameRecycleViewAdapter.flushFilter();
+        }
     }
 
     private void setupLayout() {
-        bgViewGroup = findViewById(R.id.container);
+        bgViewGroup = findViewById(R.id.view_cover_view);
+        viewContainer = findViewById(R.id.container);
     }
 
     private void setupWindowAnimations() {
@@ -149,26 +201,11 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
     private void setupEnterAnimations() {
         Transition enterTransition = getWindow().getSharedElementEnterTransition();
-        enterTransition.addListener(new Transition.TransitionListener() {
-            @Override
-            public void onTransitionStart(Transition transition) {
-            }
-
+        enterTransition.addListener(new SimpleTransition(){
             @Override
             public void onTransitionEnd(Transition transition) {
                 animateRevealShow(bgViewGroup);
-            }
-
-            @Override
-            public void onTransitionCancel(Transition transition) {
-            }
-
-            @Override
-            public void onTransitionPause(Transition transition) {
-            }
-
-            @Override
-            public void onTransitionResume(Transition transition) {
+                super.onTransitionEnd(transition);
             }
         });
     }
@@ -204,17 +241,43 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         });
     }
 
+    /** Activity Launch Animation*/
     private void animateRevealShow(View viewRoot) {
+        viewRoot.setVisibility(View.VISIBLE);
+
         int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
         int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
         int finalRadius = Math.max(viewRoot.getWidth(), viewRoot.getHeight());
 
         Animator anim = ViewAnimationUtils.createCircularReveal(viewRoot, cx, cy, 0, finalRadius);
-        viewRoot.setVisibility(View.VISIBLE);
+        anim.setInterpolator(ACCELERATE);
         anim.setDuration(ANIM_DURATION);
+
+
+        anim.addListener(new SimpleAnimationListener() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                onRaisMenu();
+                super.onAnimationEnd(animation);
+            }
+        });
+
         anim.start();
     }
 
+    private void onRaisMenu()
+    {
+        viewContainer.setVisibility(View.VISIBLE);
+        ObjectAnimator objectAnimator = ObjectAnimator.ofInt(bgViewGroup, "bottom", bgViewGroup.getBottom(), bgViewGroup.getTop());
+        objectAnimator.addListener(new SimpleAnimationListener(){
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                //appearRed();
+            }
+        });
+        objectAnimator.setInterpolator(ACCELERATE_DECELERATE);
+        objectAnimator.start();
+    }
     private void animateRevealHide(final View viewRoot) {
         int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
         int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
@@ -237,7 +300,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         lsName = (RecyclerView) findViewById(R.id.rv_frequency_list);
         lsName.addItemDecoration(new CustomDividerItemDecoration(this, null));
 
-        NameRecycleViewAdapter na = new NameRecycleViewAdapter(this, name);
+        nameRecycleViewAdapter = new NameRecycleViewAdapter(this, name);
         final VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);
 
         /* Connect the recycler to the scroller (to let the scroller scroll the list)*/
@@ -245,7 +308,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         lsName.addOnScrollListener(fastScroller.getOnScrollListener());
 
         setRecyclerViewLayoutManager(lsName);
-        lsName.setAdapter(na);
+        lsName.setAdapter(nameRecycleViewAdapter);
 
     }
 
@@ -360,7 +423,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         switch (id) {
 
             case R.id.action_search:
-                showSearchBar(cardViewSearch,centerX,centerY);
+                showSearchBar(cardViewSearch, centerX, centerY);
                 break;
         }
 
@@ -371,6 +434,9 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         hideSearchBar(cardViewSearch);
     }
 
+    /**
+     * Search bar animation Constructer
+     */
     public void showSearchBar(View myView) {
         showSearchBar(myView, 0, 0);
     }
@@ -379,6 +445,8 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
      * Animate to show Search bar
      */
     public void showSearchBar(View myView, int cx, int cy) {
+        isSearchOpen = true;
+
         // get the center for the clipping circle
 
         if (cx == 0 || cy == 0) {
@@ -401,8 +469,11 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
      * Animate to show Search bar
      */
     public void hideSearchBar(final View myView) {
-        // get the center for the clipping circle
+        /** Refresh*/
+        isSearchOpen = false;
+        editText.setText("");
 
+        // get the center for the clipping circle
         int cx = (myView.getLeft() + myView.getRight());
         int cy = (myView.getTop() + myView.getBottom());
 
@@ -424,8 +495,47 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     }
 
     @Override
-    public void onBackPressed() {
+    protected void onDestroy() {
         dbHelper.close();
-        super.onBackPressed();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isSearchOpen) {
+            hideSearchBar(cardViewSearch);
+        } else {
+
+            super.onBackPressed();
+        }
+    }
+
+    private static class SimpleTransition implements Transition.TransitionListener{
+
+        @Override
+        public void onTransitionStart(Transition transition) {
+
+        }
+
+        @Override
+        public void onTransitionEnd(Transition transition) {
+
+        }
+
+        @Override
+        public void onTransitionCancel(Transition transition) {
+
+        }
+
+        @Override
+        public void onTransitionPause(Transition transition) {
+
+        }
+
+        @Override
+        public void onTransitionResume(Transition transition) {
+
+        }
     }
 }
+

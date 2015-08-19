@@ -28,19 +28,22 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
     }
 
     public static List<M_Name> allElementDetails = Collections.emptyList();
-    private static  List<Integer> wishList = Collections.emptyList();
+    public List<M_Name> visibleObjects = Collections.emptyList();
+    private static List<Integer> wishList = Collections.emptyList();
 
     private LayoutInflater mInflater;
 
     public NameRecycleViewAdapter(Context context, List<M_Name> results) {
         allElementDetails = results;
+        visibleObjects = new ArrayList<>(allElementDetails);
+
         mInflater = LayoutInflater.from(context);
         wishList = new ArrayList<Integer>();
     }
 
     @Override
     public int getItemCount() {
-        return allElementDetails.size();
+        return visibleObjects.size();
     }
 
     @Override
@@ -54,7 +57,7 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        M_Name info = allElementDetails.get(position);
+        M_Name info = visibleObjects.get(position);
 
         if (info != null) {
 
@@ -66,16 +69,15 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
             holder.c1.setText(info.getName_en());
             holder.c2.setText(info.getName_ma());
 
-            String temp = String.format(mInflater.getContext().getResources().getString(R.string.name_frequency),info.getFrequency());
+            String temp = String.format(mInflater.getContext().getResources().getString(R.string.name_frequency), info.getFrequency());
             holder.c3.setText(temp);
 
             Formatter count = formatter.format("% 5d", (position + 1));
             holder.c4.setText(count.toString());
 
-            if (wishList.contains(allElementDetails.get(position).getId())) {
+            if (wishList.contains(visibleObjects.get(position).getId())) {
                 holder.ivSmile.setImageResource(R.mipmap.ic_favorite_black_24dp);
-            }else
-            {
+            } else {
                 holder.ivSmile.setImageResource(R.mipmap.ic_favorite_border_black_24dp);
             }
 
@@ -113,7 +115,7 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
                 public void onClick(View v) {
 
                     int position = getLayoutPosition();
-                    Integer id = allElementDetails.get(position).getId();
+                    Integer id = visibleObjects.get(position).getId();
                     if (wishList.contains(id)) {
                         ivSmile.setImageResource(R.mipmap.ic_favorite_border_black_24dp);
                         wishList.remove(id);
@@ -128,5 +130,20 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
         }
     }
 
+    public void flushFilter() {
+        visibleObjects = new ArrayList<>();
+        visibleObjects.addAll(allElementDetails);
+        notifyDataSetChanged();
+    }
+
+    public void setFilter(String queryText) {
+
+        visibleObjects = new ArrayList<>();
+        for (M_Name item : allElementDetails) {
+            if (item.getName_en().toLowerCase().contains(queryText))
+                visibleObjects.add(item);
+        }
+        notifyDataSetChanged();
+    }
 
 }
