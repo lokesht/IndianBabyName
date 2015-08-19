@@ -102,7 +102,6 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
         return array;
     }
 
-
     @Override
     public void onAlphaClickListener(final View v, final M_AlphaCount mAlphaCount) {
 

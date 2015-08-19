@@ -59,18 +59,33 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
     private CardView cardViewSearch;
 
+    int centerX;
+    int centerY;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_name_list_recycle_view);
 
-        setupLayout();
-        setupWindowAnimations();
-
         init();
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        String text = "You click at x = " + event.getX() + " and y = " + event.getY();
+
+        centerX = (int)event.getX();
+        centerY = (int)event.getY();
+        Toast.makeText(this, centerX+" "+centerY, Toast.LENGTH_LONG).show();
+
+        return super.dispatchTouchEvent(event);
+    }
+
     private void init() {
+
+        /** */
+        setupLayout();
+        setupWindowAnimations();
 
         /** Set Up Toolbar*/
         toolbar = (Toolbar) findViewById(R.id.tb_app_bar);
@@ -113,11 +128,13 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 			/* Sorting on Name based on Frequency */
             //TextView tvFrequ = (TextView) findViewById(R.id.tvFrequency);
             // tvFrequ.setOnClickListener(this);
+
+            cardViewSearch = (CardView) findViewById(R.id.cv_search);
+
         } else {
             if (c != null)
                 c.close();
         }
-
 
     }
 
@@ -218,15 +235,9 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     /** */
     public void displayList(List<M_Name> name) {
         lsName = (RecyclerView) findViewById(R.id.rv_frequency_list);
-
-//        RecyclerView.ItemDecoration itemDecoration =
-//                new DividerItemDecoration(this, LinearLayoutManager.VERTICAL);
-
         lsName.addItemDecoration(new CustomDividerItemDecoration(this, null));
-//        lsName.setItemAnimator(new DefaultItemAnimator());
 
         NameRecycleViewAdapter na = new NameRecycleViewAdapter(this, name);
-
         final VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);
 
         /* Connect the recycler to the scroller (to let the scroller scroll the list)*/
@@ -290,8 +301,6 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
                 break;
 
             case R.id.tvHindi:
-
-
                 /** This is will select only those which are not marked */
                 where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
                         + " = ''" + " ORDER BY " + TableContract.Name.NAME_MA + " ASC";
@@ -351,8 +360,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         switch (id) {
 
             case R.id.action_search:
-                cardViewSearch = (CardView) findViewById(R.id.cv_search);
-                showSearchBar(cardViewSearch);
+                showSearchBar(cardViewSearch,centerX,centerY);
                 break;
         }
 
@@ -405,7 +413,6 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, finalRadius, 0);
 
         // make the view visible and start the animation
-
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
