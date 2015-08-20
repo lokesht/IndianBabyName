@@ -63,10 +63,9 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     /**
      * Parent View
      */
-    private static final long ANIM_DURATION = 1000;
     private View bgViewGroup;
     private View viewContainer;
-
+    private View viewBelowActionBar;
     private CardView cardViewSearch;
 
     private int centerX;
@@ -97,7 +96,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         centerX = (int) event.getX();
         centerY = (int) event.getY();
 
-        //Toast.makeText(this, centerX + " " + centerY, Toast.LENGTH_LONG).show();
+       // Toast.makeText(this, centerX + " " + centerY, Toast.LENGTH_LONG).show();
 
         return super.dispatchTouchEvent(event);
     }
@@ -150,7 +149,6 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
             //TextView tvFrequ = (TextView) findViewById(R.id.tvFrequency);
             // tvFrequ.setOnClickListener(this);
 
-            cardViewSearch = (CardView) findViewById(R.id.cv_search);
 
         } else {
             if (c != null)
@@ -192,6 +190,8 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     private void setupLayout() {
         bgViewGroup = findViewById(R.id.view_cover_view);
         viewContainer = findViewById(R.id.container);
+        cardViewSearch = (CardView) findViewById(R.id.cv_search);
+        viewBelowActionBar = findViewById(R.id.ll_below_actionbar);
     }
 
     private void setupWindowAnimations() {
@@ -201,7 +201,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
     private void setupEnterAnimations() {
         Transition enterTransition = getWindow().getSharedElementEnterTransition();
-        enterTransition.addListener(new SimpleTransition(){
+        enterTransition.addListener(new SimpleTransition() {
             @Override
             public void onTransitionEnd(Transition transition) {
                 animateRevealShow(bgViewGroup);
@@ -212,11 +212,11 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
     private void setupExitAnimations() {
         Transition sharedElementReturnTransition = getWindow().getSharedElementReturnTransition();
-        sharedElementReturnTransition.setStartDelay(ANIM_DURATION);
+        sharedElementReturnTransition.setStartDelay(AppConstants.ANIM_DURATION);
 
 
         Transition returnTransition = getWindow().getReturnTransition();
-        returnTransition.setDuration(ANIM_DURATION);
+        returnTransition.setDuration(AppConstants.ANIM_DURATION);
         returnTransition.addListener(new Transition.TransitionListener() {
             @Override
             public void onTransitionStart(Transition transition) {
@@ -241,17 +241,22 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         });
     }
 
-    /** Activity Launch Animation*/
+    /**
+     * Activity Launch Animation
+     */
     private void animateRevealShow(View viewRoot) {
         viewRoot.setVisibility(View.VISIBLE);
 
-        int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
-        int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
+       // int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
+       // int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
+
+        int cx = ActivityAlphabetMain.centerX;
+        int cy= ActivityAlphabetMain.centerY;
         int finalRadius = Math.max(viewRoot.getWidth(), viewRoot.getHeight());
 
         Animator anim = ViewAnimationUtils.createCircularReveal(viewRoot, cx, cy, 0, finalRadius);
         anim.setInterpolator(ACCELERATE);
-        anim.setDuration(ANIM_DURATION);
+        anim.setDuration(AppConstants.ANIM_DURATION/2);
 
 
         anim.addListener(new SimpleAnimationListener() {
@@ -265,19 +270,21 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         anim.start();
     }
 
-    private void onRaisMenu()
-    {
+    private void onRaisMenu() {
         viewContainer.setVisibility(View.VISIBLE);
-        ObjectAnimator objectAnimator = ObjectAnimator.ofInt(bgViewGroup, "bottom", bgViewGroup.getBottom(), bgViewGroup.getTop());
-        objectAnimator.addListener(new SimpleAnimationListener(){
+        ObjectAnimator objectAnimator = ObjectAnimator.ofInt(bgViewGroup, "bottom", bgViewGroup.getBottom(), bgViewGroup.getTop() + getSupportActionBar().getHeight() + viewBelowActionBar.getHeight());
+        objectAnimator.addListener(new SimpleAnimationListener() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                bgViewGroup.setVisibility(View.GONE);
                 //appearRed();
             }
         });
         objectAnimator.setInterpolator(ACCELERATE_DECELERATE);
+        objectAnimator.setDuration(AppConstants.ANIM_DURATION/2);
         objectAnimator.start();
     }
+
     private void animateRevealHide(final View viewRoot) {
         int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
         int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
@@ -291,7 +298,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
                 viewRoot.setVisibility(View.INVISIBLE);
             }
         });
-        anim.setDuration(ANIM_DURATION);
+        anim.setDuration(AppConstants.ANIM_DURATION);
         anim.start();
     }
 
@@ -445,6 +452,8 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
      * Animate to show Search bar
      */
     public void showSearchBar(View myView, int cx, int cy) {
+        // make the view visible and start the animation
+        myView.setVisibility(View.VISIBLE);
         isSearchOpen = true;
 
         // get the center for the clipping circle
@@ -459,9 +468,17 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
         // create the animator for this view (the start radius is zero)
         Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
+        anim.addListener(new SimpleAnimationListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
 
-        // make the view visible and start the animation
-        myView.setVisibility(View.VISIBLE);
+//                ObjectAnimator obj = ObjectAnimator.ofInt(viewBelowActionBar,"bottom",viewBelowActionBar.getBottom(),viewBelowActionBar.getTop());
+//                obj.start();
+//                super.onAnimationStart(animation);
+            }
+        });
+
+
         anim.start();
     }
 
@@ -485,6 +502,12 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
         // make the view visible and start the animation
         anim.addListener(new AnimatorListenerAdapter() {
+            public void onAnimationStart(Animator animation) {
+//                ObjectAnimator obj = ObjectAnimator.ofInt(viewBelowActionBar, "bottom", viewBelowActionBar.getTop(), viewBelowActionBar.getBottom());
+//                obj.start();
+//                super.onAnimationStart(animation);
+            }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -510,7 +533,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         }
     }
 
-    private static class SimpleTransition implements Transition.TransitionListener{
+    private static class SimpleTransition implements Transition.TransitionListener {
 
         @Override
         public void onTransitionStart(Transition transition) {
@@ -538,4 +561,3 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         }
     }
 }
-

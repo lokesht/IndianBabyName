@@ -22,4 +22,6 @@ public class AppConstants {
 
 	public static int sort = 0;
 
+	public static final long ANIM_DURATION = 1000;
+
 }

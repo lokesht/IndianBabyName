@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 import java.io.File;
@@ -35,6 +36,9 @@ public class ActivityAlphabetMain extends AppCompatActivity  {
 
     private Toolbar toolbar;
 
+    public static int centerX;
+    public static int centerY;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +47,15 @@ public class ActivityAlphabetMain extends AppCompatActivity  {
         init(savedInstanceState);
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        centerX = (int) event.getX();
+        centerY = (int) event.getY();
+
+        //Toast.makeText(this, centerX + " " + centerY, Toast.LENGTH_LONG).show();
+
+        return super.dispatchTouchEvent(event);
+    }
     /**
      * Initialize Variable and list
      */
