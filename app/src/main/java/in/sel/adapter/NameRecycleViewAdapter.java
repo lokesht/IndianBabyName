@@ -138,9 +138,9 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
     }
 
     /** */
-    public void setFilter(String queryText) {
+    public void setFilter(String queryText, List<M_Name> newList) {
         visibleObjects = new ArrayList<>();
-        for (M_Name item : allElementDetails) {
+        for (M_Name item : newList) {
             if (item.getName_en().toLowerCase().contains(queryText))
                 visibleObjects.add(item);
         }
@@ -154,4 +154,8 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
         notifyDataSetChanged();
     }
 
+    public List<M_Name> getVisibleObject()
+    {
+        return visibleObjects;
+    }
 }

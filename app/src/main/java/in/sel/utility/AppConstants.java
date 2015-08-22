@@ -13,7 +13,9 @@ public class AppConstants {
 	 * in Debug Mode then he should change this variable to true otherwise make
 	 * it false at the time of installation<strong>
 	 */
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
+
+	public static boolean DEVELOER = true;
 
 	/** It Will Decide Service Download For Module */
 	public static boolean IS_MODULE = false;

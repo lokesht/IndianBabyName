@@ -94,6 +94,8 @@ public class ActivityDisplayName extends AppCompatActivity {
 
     private SortingValueHolder mSortingValueHolder;
     private SortingValueHolder mSecondarySortingValueHolder;
+    private List<M_Name> visibleObjects;
+    private FloatingActionButton mFabActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +109,8 @@ public class ActivityDisplayName extends AppCompatActivity {
     public boolean dispatchTouchEvent(MotionEvent event) {
         centerX = (int) event.getX();
         centerY = (int) event.getY();
-
+        if (AppConstants.DEBUG)
+            L.log(this, centerX + " " + centerY);
         return super.dispatchTouchEvent(event);
     }
 
@@ -150,13 +153,6 @@ public class ActivityDisplayName extends AppCompatActivity {
 
             bottomSheet = (BottomSheetLayout) findViewById(R.id.bottomsheet);
 
-            FloatingActionButton floatingActionsMenu = (FloatingActionButton) findViewById(R.id.fab_bottom);
-            floatingActionsMenu.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showBottomSheet();
-                }
-            });
 
         }
 
@@ -179,33 +175,28 @@ public class ActivityDisplayName extends AppCompatActivity {
 
     /* */
     private void onDoneSort() {
-
-        if (!mSecondarySortingValueHolder.getSortingColumn().equals(mSortingValueHolder.getSortingColumn())) {
-            switch (mSortingValueHolder.getSortingColumn()) {
-                case TableContract.Name.NAME_EN:
-                    Collections.sort(lsName, new EngNameAsc());
-                    break;
-
-                case TableContract.Name.NAME_MA:
-                    Collections.sort(lsName, new HinNameAsc());
-                    break;
-
-                case TableContract.Name.NAME_FRE:
-                    Collections.sort(lsName, new FreNameAsc());
-                    break;
-            }
-        }
-
         /** */
-        if (mSecondarySortingValueHolder.equals(mSortingValueHolder)) {
-            L.sToast(this);
-        } else {
-            ArrayList<M_Name> visibleObjects = new ArrayList<>();
+        if (!mSecondarySortingValueHolder.equals(mSortingValueHolder)) {
+            if (!mSecondarySortingValueHolder.getSortingColumn().equals(mSortingValueHolder.getSortingColumn()))
+                switch (mSecondarySortingValueHolder.getSortingColumn()) {
+                    case TableContract.Name.NAME_EN:
+                        Collections.sort(lsName, new EngNameAsc());
+                        break;
+
+                    case TableContract.Name.NAME_MA:
+                        Collections.sort(lsName, new HinNameAsc());
+                        break;
+
+                    case TableContract.Name.NAME_FRE:
+                        Collections.sort(lsName, new FreNameAsc());
+                        break;
+                }
+
+            visibleObjects = new ArrayList<>();
             List<Integer> test = mSecondarySortingValueHolder.getGenderCategory();
 
             for (M_Name item : lsName) {
                 String temp = item.getGender_cast();
-                L.log(ActivityDisplayName.this, temp);
 
                 if (test.contains(Integer.parseInt(temp)))
                     visibleObjects.add(item);
@@ -234,14 +225,12 @@ public class ActivityDisplayName extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSecondarySortingValueHolder.getGenderCategory().remove(0);
-                if (isChecked)
-                {
-                    mSecondarySortingValueHolder.getGenderCategory().add(0,0);
-                   // L.log(ActivityDisplayName.this, mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
-                }
-                else{
+                if (isChecked) {
+                    mSecondarySortingValueHolder.getGenderCategory().add(0, 0);
+                    // L.log(ActivityDisplayName.this, mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                } else {
                     mSecondarySortingValueHolder.getGenderCategory().add(0, -1);
-                   // L.log(ActivityDisplayName.this,mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                    // L.log(ActivityDisplayName.this,mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
                 }
 
             }
@@ -252,11 +241,11 @@ public class ActivityDisplayName extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSecondarySortingValueHolder.getGenderCategory().remove(1);
                 if (isChecked) {
-                   // L.log(ActivityDisplayName.this,mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
-                    mSecondarySortingValueHolder.getGenderCategory().add(1,1);
-                }else{
+                    // L.log(ActivityDisplayName.this,mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                    mSecondarySortingValueHolder.getGenderCategory().add(1, 1);
+                } else {
                     mSecondarySortingValueHolder.getGenderCategory().add(1, -1);
-                   // L.log(ActivityDisplayName.this, mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                    // L.log(ActivityDisplayName.this, mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
                 }
             }
         });
@@ -266,10 +255,11 @@ public class ActivityDisplayName extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSecondarySortingValueHolder.getGenderCategory().remove(2);
 
-                if (isChecked){
-                    mSecondarySortingValueHolder.getGenderCategory().add(2,2);}
-                else{
-                    mSecondarySortingValueHolder.getGenderCategory().add(2,-1);}
+                if (isChecked) {
+                    mSecondarySortingValueHolder.getGenderCategory().add(2, 2);
+                } else {
+                    mSecondarySortingValueHolder.getGenderCategory().add(2, -1);
+                }
             }
         });
 
@@ -285,7 +275,7 @@ public class ActivityDisplayName extends AppCompatActivity {
                     case R.id.rb_hind_name:
                         mSecondarySortingValueHolder.setSortingColumn(TableContract.Name.NAME_MA);
                         break;
-                    case R.id.rb_trans_name:
+                    case R.id.rb_frequency:
                         mSecondarySortingValueHolder.setSortingColumn(TableContract.Name.NAME_FRE);
                         break;
                 }
@@ -324,7 +314,10 @@ public class ActivityDisplayName extends AppCompatActivity {
 
     private void query(String finding) {
         if (finding.length() > 0) {
-            nameRecycleViewAdapter.setFilter(finding.toLowerCase());
+            if (visibleObjects != null && visibleObjects.size() > 0)
+                nameRecycleViewAdapter.setFilter(finding.toLowerCase(), visibleObjects);
+            else
+                nameRecycleViewAdapter.setFilter(finding.toLowerCase(), lsName);
         } else {
             nameRecycleViewAdapter.flushFilter();
         }
@@ -335,6 +328,14 @@ public class ActivityDisplayName extends AppCompatActivity {
         viewContainer = findViewById(R.id.container);
         cardViewSearch = (CardView) findViewById(R.id.cv_search);
         viewBelowActionBar = findViewById(R.id.ll_below_actionbar);
+
+        mFabActionButton = (FloatingActionButton) findViewById(R.id.fab_bottom);
+        mFabActionButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBottomSheet();
+            }
+        });
     }
 
 
@@ -353,8 +354,7 @@ public class ActivityDisplayName extends AppCompatActivity {
                     animateRevealShow(bgViewGroup);
                 }
             });
-        }else
-        {
+        } else {
 
         }
     }
@@ -395,12 +395,39 @@ public class ActivityDisplayName extends AppCompatActivity {
             @Override
             public void onAnimationEnd(Animator animation) {
                 bgViewGroup.setVisibility(View.GONE);
-                //appearRed();
+
+                appearFab();
             }
         });
         objectAnimator.setInterpolator(AppConstants.ACCELERATE_DECELERATE);
         objectAnimator.setDuration(AppConstants.ANIM_DURATION / 2);
         objectAnimator.start();
+    }
+
+    private void appearFab() {
+
+        mFabActionButton.setVisibility(View.VISIBLE);
+
+//        int cx = (mFabActionButton.getLeft() + mFabActionButton.getRight()) / 2;
+//        int cy = (mFabActionButton.getTop() + mFabActionButton.getBottom()) / 2;
+//
+//        int finalRadius = Math.max(mFabActionButton.getWidth(), mFabActionButton.getHeight());
+//
+//        if (AppConstants.DEBUG)
+//            L.log(this, cx + " " + cy + " " + mFabActionButton.getWidth()+" "+finalRadius);
+//
+//        Animator anim = ViewAnimationUtils.createCircularReveal(mFabActionButton, 481, 815, 0, finalRadius);
+//        anim.setInterpolator(AppConstants.DECELERATE);
+//
+//        anim.setDuration(10000);
+//        anim.addListener(new SimpleAnimationListener() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//
+//
+//            }
+//        });
+//        anim.start();
     }
 
     private void animateRevealHide(final View viewRoot) {
@@ -470,10 +497,10 @@ public class ActivityDisplayName extends AppCompatActivity {
 
 				/* Considering default value as -1 */
                 String desc = "-1";
-                if (s != null && s.length() > 0){
+                if (s != null && s.length() > 0) {
 
                     /* For First Release Avoiding Transgender*/
-                    if(s.equals("2"))
+                    if (s.equals("2"))
                         s = "1";
 
                     desc = s;
@@ -511,7 +538,8 @@ public class ActivityDisplayName extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void onCollapseSearch(View view) {
+    /* On Collapse Click Listener*/
+    public void onCollapseSearch(View view) {
         hideSearchBar(cardViewSearch);
     }
 

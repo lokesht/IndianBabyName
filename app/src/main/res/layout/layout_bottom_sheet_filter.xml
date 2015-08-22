@@ -42,7 +42,7 @@
             android:text="Hindi" />
 
         <RadioButton
-            android:id="@+id/rb_trans_name"
+            android:id="@+id/rb_frequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"

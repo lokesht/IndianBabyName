@@ -22,8 +22,8 @@ public class L extends Application {
 
 
     public static void log(Context context, String msg) {
-        Log.i(TAG, msg);
-       // Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        //Log.i(TAG, msg);
+       Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
     public static void log(Context context, String tag, String msg) {
