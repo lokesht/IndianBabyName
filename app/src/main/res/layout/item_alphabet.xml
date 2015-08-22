@@ -4,10 +4,10 @@
     android:id="@+id/cv"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/def_margin_horizontal"
+    android:paddingLeft="@dimen/default_padding"
     android:foreground="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:paddingRight="@dimen/def_margin_horizontal"
+    android:paddingRight="@dimen/default_padding"
     app:cardCornerRadius="@dimen/margin_tiny"
     app:cardElevation="@dimen/margin_tiny">
 

@@ -3,9 +3,59 @@
     <string name="lable_total_cout">Total unique word in this group is %1$d</string>
     <string name="name_frequency">frequency  %1$d</string>
 
+    <!--<string name="transition_view">trnsit</string>-->
+    <!--<string name="square_orange_name">square_orange</string>-->
 
-    <string name="transition_view">trnsit</string>
-    <string name="square_orange_name">square_orange</string>
+    <string name="about">about</string>
+    <string name="about_info"><font fgcolor="#ffffffff"><b>Process done by UID Innovation center to generate Name</b></font> \n
+UID Innovation center worked with more than 6.28 Crore resident names in English and Marathi.\n\n
+The English Names and Marathi names were cleaned by removing white spaces, special characters and rejecting records with ambiguous characters.\n\n
 
+The clean database of names where then broken into words by separating First name, last name, middle name by considering space as delimiter
+which generated around 15.66 crore pairs of Marathi,English Name.\n\n
 
+These 15.66 crore pairs of English, Marathi equivalent were grouped into 32 Lakh unique pairs, with frequency count.\n\n
+
+As a further cross check, the Marathi word was then transliterated to English Using GIST tool provided by CDAC.\n\n
+The English transliteration was then compared to original English word, through fuzzy matching, using Algorithm Approximate Matching of Indian Names (AMIN).\n\n
+AMIN is based on careful analysis of Indian names and surnames, and is a huge improvement over existing such algorithms.\n\n
+
+This validated, quite clean English-Marathi dictionary of Names and Surnames, containing about 3,00,000 pairs with frequency count (covering 96% of total words)
+can be useful to many programmers, and Researchers working in this area.\n\n
+
+more information is provided on https://aadhaar.maharashtra.gov.in/1077/UID-Innovation-Labs\n\n
+
+My team collected name from above link which was more than 3 lakh Unique English Marathi pair Name.\n
+We removed some Name from list by combining other for example\n\n
+	WORD_ENGLISH     WORD_MARATHI	    FREQUENCY\n
+	AKSHAY	                               अक्षय	             101128\n
+	AKSHY	                               अक्षय	             2832\n
+	AKSHYA	                               अक्षय	             2082\n
+	AKASHAY             अक्षय	             1631\n
+	AXAY	                               अक्षय	             167\n\n
+
+	these type name were in dataset as unique pair with frequency which is true but these are same name as their marathi name is same
+	so I combined all name as single with most occuring pair.\n\n
+	result Name:\n
+	      WORD_ENGLISH     WORD_MARATHI	    FREQUENCY \n
+	      AKSHAY	                               अक्षय	         107840 \n
+
+	WORD_ENGLISH	WORD_MARATHI	FREQUENCY
+	MEENA	                               मीना	         54050
+	MEENA	                              मिना	         8209
+	MEENA	                              मीणा	         194
+	MEENA	                              मिणा	         14
+
+	these are also unique pair with frequency which is true but these are same name as their English name is same
+	so same operation is repeated on this.
+	result Name:
+          MEENA	                               मीना	         62467
+
+Thanks to UID team whose work is becoming useful for app developer and researcher this application is because of data provided by UID team.
+It would be pleasure if any parent found it useful for their child Name searching.
+
+Thanks for downloading.
+
+	</string>
+    <string name="copy_database">copy_database</string>
 </resources>

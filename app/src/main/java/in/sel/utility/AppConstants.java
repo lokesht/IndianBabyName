@@ -1,5 +1,9 @@
 package in.sel.utility;
 
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+
 public class AppConstants {
 	/** */
 	public static final int SIMULATED_REFRESH_LENGTH = 2000;
@@ -23,5 +27,9 @@ public class AppConstants {
 	public static int sort = 0;
 
 	public static final long ANIM_DURATION = 1000;
+
+	public final static AccelerateInterpolator ACCELERATE = new AccelerateInterpolator();
+	public final static AccelerateDecelerateInterpolator ACCELERATE_DECELERATE = new AccelerateDecelerateInterpolator();
+	public final static DecelerateInterpolator DECELERATE = new DecelerateInterpolator();
 
 }

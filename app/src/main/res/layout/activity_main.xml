@@ -6,29 +6,24 @@
 
     <include
         android:id="@+id/tb_app_bar"
-        layout="@layout/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="@dimen/margin_tiny" />
+        layout="@layout/app_bar" />
 
-
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/dl_drawer_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+    <!--<android.support.v4.widget.DrawerLayout-->
+        <!--android:id="@+id/dl_drawer_layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
 
         <FrameLayout
             android:id="@+id/fl_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></FrameLayout>
 
-        <fragment
-            android:id="@+id/frag_navi_container"
-            android:name="in.sel.fragment.FragmentNaviDrawer"
-            android:layout_width="@dimen/drawer_width"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            tools:layout="@layout/fragment_navi_drawer" />
-    </android.support.v4.widget.DrawerLayout>
+        <!--<fragment-->
+            <!--android:id="@+id/frag_navi_container"-->
+            <!--android:name="in.sel.fragment.FragmentNaviDrawer"-->
+            <!--android:layout_width="@dimen/drawer_width"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="start"-->
+            <!--tools:layout="@layout/fragment_navi_drawer" />-->
+    <!--</android.support.v4.widget.DrawerLayout>-->
 </LinearLayout>

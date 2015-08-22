@@ -27,7 +27,7 @@ import in.sel.fragment.FragmentNaviDrawer;
 import in.sel.logging.AppLogger;
 import in.sel.utility.AppConstants;
 
-public class ActivityAlphabetMain extends AppCompatActivity  {
+public class ActivityAlphabetMain extends AppCompatActivity {
 
     public static final String SELECTED_ALPHA_BET = "alpha";
     public static final String TAG = "ActivityMain";
@@ -49,6 +49,7 @@ public class ActivityAlphabetMain extends AppCompatActivity  {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+
         centerX = (int) event.getX();
         centerY = (int) event.getY();
 
@@ -56,6 +57,7 @@ public class ActivityAlphabetMain extends AppCompatActivity  {
 
         return super.dispatchTouchEvent(event);
     }
+
     /**
      * Initialize Variable and list
      */
@@ -69,8 +71,8 @@ public class ActivityAlphabetMain extends AppCompatActivity  {
         //lsView = (ListView) findViewById(R.id.lv_left_drawer);
 
         /** */
-        FragmentNaviDrawer fragNaviDrawer = (FragmentNaviDrawer) getSupportFragmentManager().findFragmentById(R.id.frag_navi_container);
-        fragNaviDrawer.setUp(R.id.frag_navi_container, (DrawerLayout) findViewById(R.id.dl_drawer_layout), toolbar);
+//        FragmentNaviDrawer fragNaviDrawer = (FragmentNaviDrawer) getSupportFragmentManager().findFragmentById(R.id.frag_navi_container);
+//        fragNaviDrawer.setUp(R.id.frag_navi_container, (DrawerLayout) findViewById(R.id.dl_drawer_layout), toolbar);
 
         /** */
 //        ListView lsView = (ListView) findViewById(R.id.lv_left_drawer);

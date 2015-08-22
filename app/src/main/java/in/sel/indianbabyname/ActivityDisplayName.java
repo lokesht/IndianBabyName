@@ -2,10 +2,8 @@ package in.sel.indianbabyname;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,30 +15,41 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Transition;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewAnimationUtils;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.flipboard.bottomsheet.BottomSheetLayout;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import in.sel.adapter.NameRecycleViewAdapter;
 import in.sel.customview.CustomDividerItemDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
+import in.sel.exception.ValueNotInsertedException;
 import in.sel.framework.SimpleAnimationListener;
 import in.sel.logging.AppLogger;
+import in.sel.model.EngNameAsc;
+import in.sel.model.FreNameAsc;
+import in.sel.model.HinNameAsc;
 import in.sel.model.M_Name;
+import in.sel.model.SortingValueHolder;
 import in.sel.utility.AppConstants;
 import in.sel.utility.L;
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
@@ -49,10 +58,10 @@ import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScrol
  * Class is designed for Developer For Marking of Name
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class ActivityDisplayName extends AppCompatActivity implements OnClickListener {
+public class ActivityDisplayName extends AppCompatActivity {
     private String TAG = getClass().getName();
 
-    private RecyclerView lsName;
+    private RecyclerView recyclerView;
     private Toolbar toolbar;
     /** */
     private static String selectedAlphabet = "";
@@ -71,6 +80,8 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     private int centerX;
     private int centerY;
 
+    private List<M_Name> lsName;
+
     /**
      * Search Edit Box Edit
      */
@@ -78,10 +89,11 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     private NameRecycleViewAdapter nameRecycleViewAdapter;
 
     private boolean isSearchOpen = false;
+    private BottomSheetLayout bottomSheet;
+    private View bottomSheetView;
 
-    final static AccelerateInterpolator ACCELERATE = new AccelerateInterpolator();
-    final static AccelerateDecelerateInterpolator ACCELERATE_DECELERATE = new AccelerateDecelerateInterpolator();
-    final static DecelerateInterpolator DECELERATE = new DecelerateInterpolator();
+    private SortingValueHolder mSortingValueHolder;
+    private SortingValueHolder mSecondarySortingValueHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,12 +108,13 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         centerX = (int) event.getX();
         centerY = (int) event.getY();
 
-       // Toast.makeText(this, centerX + " " + centerY, Toast.LENGTH_LONG).show();
-
         return super.dispatchTouchEvent(event);
     }
 
     private void init() {
+
+        /* Default Object*/
+        mSortingValueHolder = new SortingValueHolder(true);
 
         /** */
         setupLayout();
@@ -110,15 +123,13 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         /** Set Up Toolbar*/
         toolbar = (Toolbar) findViewById(R.id.tb_app_bar);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         dbHelper = new DBHelper(this);
 
-        String selectedAlphabet = getIntent().getStringExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET);
-
-        /** This is will select only those which are not marked */
-        String where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' ORDER BY " + TableContract.Name.NAME_FRE + " DESC";
+        /** This is will select only elligible Name */
+        selectedAlphabet = getIntent().getStringExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET);
+        String where = getSortQuery();
 
         Cursor c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
                 TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
@@ -129,37 +140,169 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
             if (AppConstants.DEBUG)
                 AppLogger.ToastLong(this, c.getCount() + "");
 
-            List<M_Name> name = parseListName(c);
-            displayList(name);
+            lsName = parseListName(c);
+            displayList(lsName);
 
 			/* */
             TextView tvTotal = (TextView) findViewById(R.id.tvTotal);
             String s = String.format(getResources().getString(R.string.lable_total_cout), c.getCount());
             tvTotal.setText(s);
 
-			/* Sorting on Name based on English Name */
-            //TextView tvEnName = (TextView) findViewById(R.id.tvEnglish);
-            // tvEnName.setOnClickListener(this);
+            bottomSheet = (BottomSheetLayout) findViewById(R.id.bottomsheet);
 
-			/* Sorting on Name based on Marathi Name */
-            //TextView tvHinName = (TextView) findViewById(R.id.tvHindi);
-            // tvHinName.setOnClickListener(this);
+            FloatingActionButton floatingActionsMenu = (FloatingActionButton) findViewById(R.id.fab_bottom);
+            floatingActionsMenu.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showBottomSheet();
+                }
+            });
 
-			/* Sorting on Name based on Frequency */
-            //TextView tvFrequ = (TextView) findViewById(R.id.tvFrequency);
-            // tvFrequ.setOnClickListener(this);
-
-
-        } else {
-            if (c != null)
-                c.close();
         }
 
         /** Implement Text Watcher*/
         onSearchListener();
     }
 
-    public void onSearchListener() {
+    public void showBottomSheet() {
+        if (isSearchOpen)
+            hideSearchBar(cardViewSearch);
+
+        if (bottomSheetView == null) {
+            bottomSheetView = LayoutInflater.from(this).inflate(R.layout.layout_bottom_sheet_filter, bottomSheet, false);
+            sortAndFilter();
+        }
+
+        mSecondarySortingValueHolder = new SortingValueHolder(mSortingValueHolder);
+        bottomSheet.showWithSheetView(bottomSheetView);
+    }
+
+    /* */
+    private void onDoneSort() {
+
+        if (!mSecondarySortingValueHolder.getSortingColumn().equals(mSortingValueHolder.getSortingColumn())) {
+            switch (mSortingValueHolder.getSortingColumn()) {
+                case TableContract.Name.NAME_EN:
+                    Collections.sort(lsName, new EngNameAsc());
+                    break;
+
+                case TableContract.Name.NAME_MA:
+                    Collections.sort(lsName, new HinNameAsc());
+                    break;
+
+                case TableContract.Name.NAME_FRE:
+                    Collections.sort(lsName, new FreNameAsc());
+                    break;
+            }
+        }
+
+        /** */
+        if (mSecondarySortingValueHolder.equals(mSortingValueHolder)) {
+            L.sToast(this);
+        } else {
+            ArrayList<M_Name> visibleObjects = new ArrayList<>();
+            List<Integer> test = mSecondarySortingValueHolder.getGenderCategory();
+
+            for (M_Name item : lsName) {
+                String temp = item.getGender_cast();
+                L.log(ActivityDisplayName.this, temp);
+
+                if (test.contains(Integer.parseInt(temp)))
+                    visibleObjects.add(item);
+            }
+
+            nameRecycleViewAdapter.setSort(visibleObjects);
+            mSecondarySortingValueHolder = mSortingValueHolder;
+        }
+        bottomSheet.dismissSheet();
+    }
+
+    private void sortAndFilter() {
+        Button btn = (Button) bottomSheetView.findViewById(R.id.btn_done);
+        btn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onDoneSort();
+            }
+        });
+
+        CheckBox cbMale = (CheckBox) bottomSheetView.findViewById(R.id.cb_male);
+        CheckBox cbFemale = (CheckBox) bottomSheetView.findViewById(R.id.cb_female);
+        CheckBox cbTransGender = (CheckBox) bottomSheetView.findViewById(R.id.cb_transgender);
+
+        cbMale.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSecondarySortingValueHolder.getGenderCategory().remove(0);
+                if (isChecked)
+                {
+                    mSecondarySortingValueHolder.getGenderCategory().add(0,0);
+                   // L.log(ActivityDisplayName.this, mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                }
+                else{
+                    mSecondarySortingValueHolder.getGenderCategory().add(0, -1);
+                   // L.log(ActivityDisplayName.this,mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                }
+
+            }
+        });
+
+        cbFemale.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSecondarySortingValueHolder.getGenderCategory().remove(1);
+                if (isChecked) {
+                   // L.log(ActivityDisplayName.this,mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                    mSecondarySortingValueHolder.getGenderCategory().add(1,1);
+                }else{
+                    mSecondarySortingValueHolder.getGenderCategory().add(1, -1);
+                   // L.log(ActivityDisplayName.this, mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                }
+            }
+        });
+
+        cbTransGender.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSecondarySortingValueHolder.getGenderCategory().remove(2);
+
+                if (isChecked){
+                    mSecondarySortingValueHolder.getGenderCategory().add(2,2);}
+                else{
+                    mSecondarySortingValueHolder.getGenderCategory().add(2,-1);}
+            }
+        });
+
+        //sortingColumn
+        RadioGroup radioGroup = (RadioGroup) bottomSheetView.findViewById(R.id.rg_sorting);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.rb_eng_name:
+                        mSecondarySortingValueHolder.setSortingColumn(TableContract.Name.NAME_EN);
+                        break;
+                    case R.id.rb_hind_name:
+                        mSecondarySortingValueHolder.setSortingColumn(TableContract.Name.NAME_MA);
+                        break;
+                    case R.id.rb_trans_name:
+                        mSecondarySortingValueHolder.setSortingColumn(TableContract.Name.NAME_FRE);
+                        break;
+                }
+            }
+        });
+    }
+
+    /* */
+    private String getSortQuery() {
+        String where = TableContract.Name.GENDER_CAST + " IN(0,1,2) " + " AND " +
+                TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' ORDER BY " + TableContract.Name.NAME_FRE + " DESC";
+
+        return where;
+    }
+
+    /* */
+    private void onSearchListener() {
         editText = (EditText) findViewById(R.id.et_search_box);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -194,51 +337,26 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         viewBelowActionBar = findViewById(R.id.ll_below_actionbar);
     }
 
+
     private void setupWindowAnimations() {
         setupEnterAnimations();
-        setupExitAnimations();
     }
 
     private void setupEnterAnimations() {
-        Transition enterTransition = getWindow().getSharedElementEnterTransition();
-        enterTransition.addListener(new SimpleTransition() {
-            @Override
-            public void onTransitionEnd(Transition transition) {
-                animateRevealShow(bgViewGroup);
-                super.onTransitionEnd(transition);
-            }
-        });
-    }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            bgViewGroup.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    //toggleInformationView(view);
+                    animateRevealShow(bgViewGroup);
+                }
+            });
+        }else
+        {
 
-    private void setupExitAnimations() {
-        Transition sharedElementReturnTransition = getWindow().getSharedElementReturnTransition();
-        sharedElementReturnTransition.setStartDelay(AppConstants.ANIM_DURATION);
-
-
-        Transition returnTransition = getWindow().getReturnTransition();
-        returnTransition.setDuration(AppConstants.ANIM_DURATION);
-        returnTransition.addListener(new Transition.TransitionListener() {
-            @Override
-            public void onTransitionStart(Transition transition) {
-                animateRevealHide(bgViewGroup);
-            }
-
-            @Override
-            public void onTransitionEnd(Transition transition) {
-            }
-
-            @Override
-            public void onTransitionCancel(Transition transition) {
-            }
-
-            @Override
-            public void onTransitionPause(Transition transition) {
-            }
-
-            @Override
-            public void onTransitionResume(Transition transition) {
-            }
-        });
+        }
     }
 
     /**
@@ -247,16 +365,16 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     private void animateRevealShow(View viewRoot) {
         viewRoot.setVisibility(View.VISIBLE);
 
-       // int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
-       // int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
+        // int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
+        // int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
 
         int cx = ActivityAlphabetMain.centerX;
-        int cy= ActivityAlphabetMain.centerY;
+        int cy = ActivityAlphabetMain.centerY;
         int finalRadius = Math.max(viewRoot.getWidth(), viewRoot.getHeight());
 
         Animator anim = ViewAnimationUtils.createCircularReveal(viewRoot, cx, cy, 0, finalRadius);
-        anim.setInterpolator(ACCELERATE);
-        anim.setDuration(AppConstants.ANIM_DURATION/2);
+        anim.setInterpolator(AppConstants.ACCELERATE);
+        anim.setDuration(AppConstants.ANIM_DURATION / 2);
 
 
         anim.addListener(new SimpleAnimationListener() {
@@ -280,8 +398,8 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
                 //appearRed();
             }
         });
-        objectAnimator.setInterpolator(ACCELERATE_DECELERATE);
-        objectAnimator.setDuration(AppConstants.ANIM_DURATION/2);
+        objectAnimator.setInterpolator(AppConstants.ACCELERATE_DECELERATE);
+        objectAnimator.setDuration(AppConstants.ANIM_DURATION / 2);
         objectAnimator.start();
     }
 
@@ -304,25 +422,24 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
     /** */
     public void displayList(List<M_Name> name) {
-        lsName = (RecyclerView) findViewById(R.id.rv_frequency_list);
-        lsName.addItemDecoration(new CustomDividerItemDecoration(this, null));
+        recyclerView = (RecyclerView) findViewById(R.id.rv_frequency_list);
+        recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
 
         nameRecycleViewAdapter = new NameRecycleViewAdapter(this, name);
         final VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);
 
         /* Connect the recycler to the scroller (to let the scroller scroll the list)*/
-        fastScroller.setRecyclerView(lsName);
-        lsName.addOnScrollListener(fastScroller.getOnScrollListener());
+        fastScroller.setRecyclerView(recyclerView);
+        recyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
 
-        setRecyclerViewLayoutManager(lsName);
-        lsName.setAdapter(nameRecycleViewAdapter);
-
+        setRecyclerViewLayoutManager(recyclerView);
+        recyclerView.setAdapter(nameRecycleViewAdapter);
     }
 
     /**
      * Set RecyclerView's LayoutManager
      */
-    public void setRecyclerViewLayoutManager(RecyclerView recyclerView) {
+    private void setRecyclerViewLayoutManager(RecyclerView recyclerView) {
         int scrollPosition = 0;
 
         // If a layout manager has already been set, get current scroll position.
@@ -337,56 +454,8 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         recyclerView.scrollToPosition(scrollPosition);
     }
 
-    @Override
-    public void onClick(View v) {
-        String where = "";
-        Cursor c = null;
-
-        switch (v.getId()) {
-            case R.id.tvFrequency:
-
-                /** This is will select only those which are not marked */
-                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
-                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_FRE + " DESC";
-
-                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
-                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
-                        TableContract.Name.GENDER_CAST}, where);
-
-
-                break;
-
-            case R.id.tvEnglish:
-
-
-                /** This is will select only those which are not marked */
-                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
-                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_EN + " ASC";
-
-                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
-                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
-                        TableContract.Name.GENDER_CAST}, where);
-
-
-                break;
-
-            case R.id.tvHindi:
-                /** This is will select only those which are not marked */
-                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
-                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_MA + " ASC";
-
-                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
-                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
-                        TableContract.Name.GENDER_CAST}, where);
-
-
-                break;
-        }
-
-    }
-
     /** */
-    List<M_Name> parseListName(Cursor c) {
+    private List<M_Name> parseListName(Cursor c) {
         List<M_Name> lsName = new ArrayList<M_Name>();
         if (c != null && c.getCount() > 0) {
             c.moveToFirst();
@@ -401,8 +470,14 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
 				/* Considering default value as -1 */
                 String desc = "-1";
-                if (s != null && s.length() > 0)
+                if (s != null && s.length() > 0){
+
+                    /* For First Release Avoiding Transgender*/
+                    if(s.equals("2"))
+                        s = "1";
+
                     desc = s;
+                }
 
                 M_Name temp = new M_Name(ma, en, fre, id, desc);
                 lsName.add(temp);
@@ -410,7 +485,6 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
             /** Close database */
             c.close();
-            dbHelper.close();
         }
         return lsName;
     }
@@ -437,21 +511,21 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
         return super.onOptionsItemSelected(item);
     }
 
-    public void onCollapseSearch(View view) {
+    private void onCollapseSearch(View view) {
         hideSearchBar(cardViewSearch);
     }
 
     /**
      * Search bar animation Constructer
      */
-    public void showSearchBar(View myView) {
+    private void showSearchBar(View myView) {
         showSearchBar(myView, 0, 0);
     }
 
     /**
      * Animate to show Search bar
      */
-    public void showSearchBar(View myView, int cx, int cy) {
+    private void showSearchBar(View myView, int cx, int cy) {
         // make the view visible and start the animation
         myView.setVisibility(View.VISIBLE);
         isSearchOpen = true;
@@ -485,7 +559,7 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
     /**
      * Animate to show Search bar
      */
-    public void hideSearchBar(final View myView) {
+    private void hideSearchBar(final View myView) {
         /** Refresh*/
         isSearchOpen = false;
         editText.setText("");
@@ -560,4 +634,53 @@ public class ActivityDisplayName extends AppCompatActivity implements OnClickLis
 
         }
     }
+
+    //    @Override
+//    public void onClick(View v) {
+//        String where = "";
+//        Cursor c = null;
+//
+//        switch (v.getId()) {
+//            case R.id.tvFrequency:
+//
+//                /** This is will select only those which are not marked */
+//                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
+//                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_FRE + " DESC";
+//
+//                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
+//                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
+//                        TableContract.Name.GENDER_CAST}, where);
+//
+//
+//                break;
+//
+//            case R.id.tvEnglish:
+//
+//
+//                /** This is will select only those which are not marked */
+//                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
+//                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_EN + " ASC";
+//
+//                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
+//                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
+//                        TableContract.Name.GENDER_CAST}, where);
+//
+//
+//                break;
+//
+//            case R.id.tvHindi:
+//                /** This is will select only those which are not marked */
+//                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
+//                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_MA + " ASC";
+//
+//                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
+//                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
+//                        TableContract.Name.GENDER_CAST}, where);
+//
+//
+//                break;
+//        }
+//
+//    }
+
 }

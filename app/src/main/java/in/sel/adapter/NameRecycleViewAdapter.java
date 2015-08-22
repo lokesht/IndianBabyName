@@ -130,19 +130,27 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
         }
     }
 
+    /** */
     public void flushFilter() {
         visibleObjects = new ArrayList<>();
         visibleObjects.addAll(allElementDetails);
         notifyDataSetChanged();
     }
 
+    /** */
     public void setFilter(String queryText) {
-
         visibleObjects = new ArrayList<>();
         for (M_Name item : allElementDetails) {
             if (item.getName_en().toLowerCase().contains(queryText))
                 visibleObjects.add(item);
         }
+        notifyDataSetChanged();
+    }
+
+    /** Sort */
+    public void setSort(List<M_Name> lsName) {
+        visibleObjects = new ArrayList<>();
+        visibleObjects.addAll(lsName);
         notifyDataSetChanged();
     }
 

@@ -74,7 +74,6 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
         SparseArray array = getCount();
         AlphabetRecyclerViewAdapter adapter = new AlphabetRecyclerViewAdapter(getActivity(), array, this);
         rv.setAdapter(adapter);
-
     }
 
     /**
@@ -124,14 +123,14 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
                 in.putExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET, mAlphaCount.getAlphabet());
 
                 View sharedView = v;
-                String transitionName = getString(R.string.square_orange_name);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity(), sharedView, transitionName);
-                    getActivity().startActivity(in, transitionActivityOptions.toBundle());
-                } else {
+//                String transitionName = getString(R.string.square_orange_name);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                    ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity(), sharedView, transitionName);
+//                    getActivity().startActivity(in, transitionActivityOptions.toBundle());
+//                } else {
                     getActivity().startActivity(in);
                     getActivity().overridePendingTransition(0, 0);
-                }
+       //         }
 //            }
 //
 //            @Override

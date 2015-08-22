@@ -21,6 +21,7 @@
         <activity android:name="in.sel.indianbabyname.ActivityAbout" />
         <activity android:name=".ActivityAlphabetMain" />
         <activity
+            android:theme="@style/Transparent"
             android:name=".ActivityDisplayName"
             android:parentActivityName=".ActivityAlphabetMain">
             <meta-data
