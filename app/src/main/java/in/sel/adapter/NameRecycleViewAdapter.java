@@ -1,5 +1,6 @@
 package in.sel.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +14,8 @@ import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
 
+import in.sel.dbhelper.DBHelper;
+import in.sel.dbhelper.TableContract;
 import in.sel.indianbabyname.R;
 import in.sel.model.M_Name;
 import in.sel.utility.AppConstants;
@@ -23,22 +26,18 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
     //keep track of the previous position for animations where scrolling down requires a different animation compared to scrolling up
     private int mPreviousPosition = 0;
 
-    public interface OnFavouriteClick {
-        void onMakeFavourite(int id, int position);
-    }
-
-    public static List<M_Name> allElementDetails = Collections.emptyList();
-    public List<M_Name> visibleObjects = Collections.emptyList();
-    private static List<Integer> wishList = Collections.emptyList();
+    private static List<M_Name> allElementDetails = Collections.emptyList();
+    private List<M_Name> visibleObjects = Collections.emptyList();
+    List<Integer> mWishList = Collections.emptyList();
 
     private LayoutInflater mInflater;
 
-    public NameRecycleViewAdapter(Context context, List<M_Name> results) {
+    public NameRecycleViewAdapter(Context context, List<M_Name> results, List<Integer> wishList) {
         allElementDetails = results;
         visibleObjects = new ArrayList<>(allElementDetails);
 
         mInflater = LayoutInflater.from(context);
-        wishList = new ArrayList<Integer>();
+        mWishList = wishList;
     }
 
     @Override
@@ -75,7 +74,7 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
             Formatter count = formatter.format("% 5d", (position + 1));
             holder.c4.setText(count.toString());
 
-            if (wishList.contains(visibleObjects.get(position).getId())) {
+            if (mWishList.contains(visibleObjects.get(position).getId())) {
                 holder.ivSmile.setImageResource(R.mipmap.ic_favorite_black_24dp);
             } else {
                 holder.ivSmile.setImageResource(R.mipmap.ic_favorite_border_black_24dp);
@@ -114,17 +113,32 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
                 @Override
                 public void onClick(View v) {
 
+                    DBHelper dbh = new DBHelper(mInflater.getContext());
                     int position = getLayoutPosition();
                     Integer id = visibleObjects.get(position).getId();
-                    if (wishList.contains(id)) {
+                    if (mWishList.contains(id)) {
                         ivSmile.setImageResource(R.mipmap.ic_favorite_border_black_24dp);
-                        wishList.remove(id);
-                        //notifyItemChanged(position);
+                        mWishList.remove(id);
+
+                        String where = TableContract.FavourateName.NAME_ID + " = " + id;
+                        dbh.deleteRow(TableContract.FavourateName.TABLE_NAME, where);
+
                     } else {
                         ivSmile.setImageResource(R.mipmap.ic_favorite_black_24dp);
-                        wishList.add(id);
-                        //notifyItemChanged(position);
+
+                        ContentValues cv = new ContentValues();
+                        cv.put(TableContract.FavourateName.NAME_EN,visibleObjects.get(position).getName_en());
+                        cv.put(TableContract.FavourateName.NAME_MA,visibleObjects.get(position).getName_ma());
+                        cv.put(TableContract.FavourateName.NAME_FRE,visibleObjects.get(position).getFrequency());
+                        cv.put(TableContract.FavourateName.GENDER_CAST,visibleObjects.get(position).getGender_cast());
+                        cv.put(TableContract.FavourateName.NAME_ID,visibleObjects.get(position).getId());
+
+                        long tempId = dbh.insertInTable(TableContract.FavourateName.TABLE_NAME,null,cv);
+                        mWishList.add(id);
+
                     }
+
+                    dbh.close();
                 }
             });
         }
@@ -147,15 +161,16 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
         notifyDataSetChanged();
     }
 
-    /** Sort */
+    /**
+     * Sort
+     */
     public void setSort(List<M_Name> lsName) {
         visibleObjects = new ArrayList<>();
         visibleObjects.addAll(lsName);
         notifyDataSetChanged();
     }
 
-    public List<M_Name> getVisibleObject()
-    {
+    public List<M_Name> getVisibleObject() {
         return visibleObjects;
     }
 }

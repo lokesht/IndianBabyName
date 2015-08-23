@@ -38,7 +38,7 @@
                         android:id="@+id/cv_search"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:visibility="invisible">
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -70,14 +70,13 @@
 
                 </FrameLayout>
 
-
                 <LinearLayout
+                    android:translationZ="-4dp"
                     android:id="@+id/ll_below_actionbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/colorPrimary"
-                    android:orientation="vertical"
-                    android:translationZ="@dimen/margin_tiny">
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tvTotal"

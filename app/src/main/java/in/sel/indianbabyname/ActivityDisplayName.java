@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,14 +27,13 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,8 +42,8 @@ import in.sel.adapter.NameRecycleViewAdapter;
 import in.sel.customview.CustomDividerItemDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
-import in.sel.exception.ValueNotInsertedException;
 import in.sel.framework.SimpleAnimationListener;
+import in.sel.framework.HidingScrollListener;
 import in.sel.logging.AppLogger;
 import in.sel.model.EngNameAsc;
 import in.sel.model.FreNameAsc;
@@ -96,9 +96,10 @@ public class ActivityDisplayName extends AppCompatActivity {
     private SortingValueHolder mSecondarySortingValueHolder;
     private List<M_Name> visibleObjects;
     private FloatingActionButton mFabActionButton;
+    private List<Integer> mWishList = new ArrayList<Integer>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {/**/
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_name_list_recycle_view);
 
@@ -132,14 +133,25 @@ public class ActivityDisplayName extends AppCompatActivity {
 
         /** This is will select only elligible Name */
         selectedAlphabet = getIntent().getStringExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET);
-        String where = getSortQuery();
 
-        Cursor c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
-                TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
-                TableContract.Name.GENDER_CAST}, where);
+        String where = null;
+        Cursor c;
 
-        if (c != null && c.getCount() > 0) {
+        if (!selectedAlphabet.equalsIgnoreCase("Favourite")) {
+           where = getNameSelectionQuery();
 
+            c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
+                    TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
+                    TableContract.Name.GENDER_CAST}, where);
+        } else {
+
+            c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]{TableContract.FavourateName.AUTO_ID,
+                    TableContract.FavourateName.NAME_EN, TableContract.FavourateName.NAME_MA, TableContract.FavourateName.NAME_FRE,
+                    TableContract.FavourateName.GENDER_CAST}, where);
+        }
+
+        if (c != null && c.getCount() > 0)
+        {
             if (AppConstants.DEBUG)
                 AppLogger.ToastLong(this, c.getCount() + "");
 
@@ -150,14 +162,29 @@ public class ActivityDisplayName extends AppCompatActivity {
             TextView tvTotal = (TextView) findViewById(R.id.tvTotal);
             String s = String.format(getResources().getString(R.string.lable_total_cout), c.getCount());
             tvTotal.setText(s);
-
-            bottomSheet = (BottomSheetLayout) findViewById(R.id.bottomsheet);
-
-
         }
 
-        /** Implement Text Watcher*/
+        /** This will find all wishlist of User*/
+        c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]
+
+                {
+                        TableContract.FavourateName.NAME_ID
+                }
+
+                , null);
+        mWishList =
+
+                parseWishList(c);
+
+        bottomSheet = (BottomSheetLayout)
+
+                findViewById(R.id.bottomsheet);
+
+        /**
+         * Implement Text Watcher
+         */
         onSearchListener();
+
     }
 
     public void showBottomSheet() {
@@ -284,7 +311,7 @@ public class ActivityDisplayName extends AppCompatActivity {
     }
 
     /* */
-    private String getSortQuery() {
+    private String getNameSelectionQuery() {
         String where = TableContract.Name.GENDER_CAST + " IN(0,1,2) " + " AND " +
                 TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' ORDER BY " + TableContract.Name.NAME_FRE + " DESC";
 
@@ -452,15 +479,39 @@ public class ActivityDisplayName extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.rv_frequency_list);
         recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
 
-        nameRecycleViewAdapter = new NameRecycleViewAdapter(this, name);
+        nameRecycleViewAdapter = new NameRecycleViewAdapter(this, name, mWishList);
         final VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);
 
         /* Connect the recycler to the scroller (to let the scroller scroll the list)*/
         fastScroller.setRecyclerView(recyclerView);
         recyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
+        recyclerView.addOnScrollListener(new HidingScrollListener() {
+            @Override
+            public void onHide() {
+                hideFloatingViews();
+            }
+
+            @Override
+            public void onShow() {
+                showFloatingViews();
+            }
+        });
 
         setRecyclerViewLayoutManager(recyclerView);
         recyclerView.setAdapter(nameRecycleViewAdapter);
+    }
+
+    private void hideFloatingViews() {
+        // viewBelowActionBar.animate().translationY(-viewBelowActionBar.getHeight()*2).setInterpolator(AppConstants.ACCELERATE);
+
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mFabActionButton.getLayoutParams();
+        int fabBottomMargin = lp.bottomMargin;
+        mFabActionButton.animate().translationY(mFabActionButton.getHeight() + fabBottomMargin).setInterpolator(AppConstants.ACCELERATE);
+    }
+
+    private void showFloatingViews() {
+        // viewBelowActionBar.animate().translationY(0).setInterpolator(AppConstants.DECELERATE);
+        mFabActionButton.animate().translationY(0).setInterpolator(AppConstants.DECELERATE);
     }
 
     /**
@@ -514,6 +565,18 @@ public class ActivityDisplayName extends AppCompatActivity {
             c.close();
         }
         return lsName;
+    }
+
+    private List<Integer> parseWishList(Cursor c) {
+
+        if (c != null && c.moveToFirst()) {
+            do {
+                Integer in = c.getInt(0);
+                mWishList.add(in);
+            } while (c.moveToNext());
+            c.close();
+        }
+        return mWishList;
     }
 
     @Override
@@ -632,34 +695,6 @@ public class ActivityDisplayName extends AppCompatActivity {
         } else {
 
             super.onBackPressed();
-        }
-    }
-
-    private static class SimpleTransition implements Transition.TransitionListener {
-
-        @Override
-        public void onTransitionStart(Transition transition) {
-
-        }
-
-        @Override
-        public void onTransitionEnd(Transition transition) {
-
-        }
-
-        @Override
-        public void onTransitionCancel(Transition transition) {
-
-        }
-
-        @Override
-        public void onTransitionPause(Transition transition) {
-
-        }
-
-        @Override
-        public void onTransitionResume(Transition transition) {
-
         }
     }
 

@@ -35,6 +35,7 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
 
     private String TAG = getClass().getName();
     private RecyclerView rv;
+    DBHelper db;
 
     public static FragmentAlphabetHome getInstance() {
         FragmentAlphabetHome fragAlpha = new FragmentAlphabetHome();
@@ -80,13 +81,26 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
      * Give count of Remaining Value in each section
      */
     private SparseArray getCount() {
-        DBHelper db = new DBHelper(getActivity());
-        SparseArray array = new SparseArray(26);
-        Cursor c = db.getTableValue(TableContract.CountValue.TABLE_NAME, new String[]{TableContract.CountValue.ALPHABET, TableContract.CountValue.ALPH_COUNT}, null);
+        SparseArray array;
+        db = new DBHelper(getActivity());
 
-        if (c != null && c.getCount() > 0) {
-            c.moveToFirst();
-            int trace = 0;
+        Cursor c = db.getTableValue(TableContract.FavourateName.TABLE_NAME, null, null);
+        int arrayCount = 26;
+        int trace = 0;
+        if (c != null && c.moveToFirst()) {
+            arrayCount++;
+            array = new SparseArray(arrayCount);
+            array.append(trace, new M_AlphaCount(c.getCount(), "Favourite"));
+            trace++;
+
+        } else {
+            array = new SparseArray(arrayCount);
+        }
+
+        c = db.getTableValue(TableContract.CountValue.TABLE_NAME, new String[]{TableContract.CountValue.ALPHABET, TableContract.CountValue.ALPH_COUNT}, null);
+
+        if (c != null && c.moveToFirst()) {
+
             do {
                 int alphaCount = c.getInt(c.getColumnIndex(TableContract.CountValue.ALPH_COUNT));
                 String alpha = c.getString(c.getColumnIndex(TableContract.CountValue.ALPHABET));
@@ -94,8 +108,9 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
                 array.append(trace, new M_AlphaCount(alphaCount, alpha));
                 trace++;
             } while (c.moveToNext());
+            c.close();
         }
-        db.close();
+
         return array;
     }
 
@@ -119,18 +134,18 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
 //
 //            @Override
 //            public void onAnimationEnd(Animator animation) {
-                Intent in = new Intent(getActivity(), ActivityDisplayName.class);
-                in.putExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET, mAlphaCount.getAlphabet());
+        Intent in = new Intent(getActivity(), ActivityDisplayName.class);
+        in.putExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET, mAlphaCount.getAlphabet());
 
-                View sharedView = v;
+        View sharedView = v;
 //                String transitionName = getString(R.string.square_orange_name);
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //                    ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity(), sharedView, transitionName);
 //                    getActivity().startActivity(in, transitionActivityOptions.toBundle());
 //                } else {
-                    getActivity().startActivity(in);
-                    getActivity().overridePendingTransition(0, 0);
-       //         }
+        getActivity().startActivity(in);
+        getActivity().overridePendingTransition(0, 0);
+        //         }
 //            }
 //
 //            @Override
@@ -141,5 +156,11 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
 //            public void onAnimationRepeat(Animator animation) {
 //            }
 //        });
+    }
+
+    @Override
+    public void onDestroy() {
+        db.close();
+        super.onDestroy();
     }
 }

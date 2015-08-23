@@ -16,10 +16,11 @@ public class AlphabetGridHolder extends RecyclerView.ViewHolder {
     TextView tvAlpha;
     TextView tvCount;
 
-    public AlphabetGridHolder(View itemView) {
+    public AlphabetGridHolder(View itemView, boolean isFavourite) {
         super(itemView);
         cv = (CardView) itemView.findViewById(R.id.cv);
-        tvAlpha = (TextView) itemView.findViewById(R.id.tv_alphabet);
+        if (!isFavourite)
+            tvAlpha = (TextView) itemView.findViewById(R.id.tv_alphabet);
         tvCount = (TextView) itemView.findViewById(R.id.tv_count);
     }
 }

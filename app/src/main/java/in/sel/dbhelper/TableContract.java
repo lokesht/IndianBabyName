@@ -78,23 +78,30 @@ public class TableContract {
 	}
 	
 	/** Saved Status Of*/
-	public interface SavedStatus
+	public interface FavourateName
 	{
-		String TABLE_NAME = "SavedStatus";
+		String TABLE_NAME = "favourite";
 		String AUTO_ID = "_id";
-		String LETTER = "Letter";
-		String INDEX = "Ind";
-		String POSITION = "Pos";
-		
+		String NAME_EN = "NameEn";
+		String NAME_MA = "NameMa";
+		String NAME_FRE = "NameFre";
+		String GENDER_CAST = "Gender_Cast";
+		String NAME_ID = "Name_id";
+		String IS_ACTIVE = "is_active";
+
+
 		String SQL_CREATE = CREATE_TABLE+TABLE_NAME
 			    +OPEN_BRACE
 			    +AUTO_ID + TYPE_INTEGER+PRIMARY_KEY+AUTO_INCREMENT+SEP_COMMA
-			    +LETTER+TYPE_TEXT+SEP_COMMA
-			    +INDEX+TYPE_TEXT+SEP_COMMA
-			    +POSITION+TYPE_INTEGER+SEP_COMMA
+			    +NAME_EN+TYPE_TEXT+SEP_COMMA
+			    +NAME_MA+TYPE_TEXT+SEP_COMMA
+			    +NAME_FRE+TYPE_INTEGER+SEP_COMMA
+				+GENDER_CAST+TYPE_TEXT+SEP_COMMA
+				+NAME_ID+TYPE_INTEGER+SEP_COMMA
+				+IS_ACTIVE+TYPE_INTEGER+SEP_COMMA
 			    + UNIQUE 
 			     + OPEN_BRACE 
-			       + LETTER
+			       + NAME_ID
 			     + CLOSE_BRACE + ON_CONFLICT_REPLACE
 			    +CLOSE_BRACE;
 	String SQL_DROP = DROP_TABLE+TABLE_NAME;

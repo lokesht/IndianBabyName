@@ -16,9 +16,12 @@ import in.sel.model.M_AlphaCount;
  */
 public class AlphabetRecyclerViewAdapter extends RecyclerView.Adapter<AlphabetGridHolder> {
 
+    private static final int TYPE_FAVOURATE = 2;
+    private static final int TYPE_ITEM = 1;
+
     private Context mContext;
-    public SparseArray array;
-    OnAlphabetListener onAlphabetListener;
+    private SparseArray array;
+    private OnAlphabetListener onAlphabetListener;
 
     public AlphabetRecyclerViewAdapter(Context context, SparseArray array, OnAlphabetListener onAlphabetListener) {
         mContext = context;
@@ -28,25 +31,44 @@ public class AlphabetRecyclerViewAdapter extends RecyclerView.Adapter<AlphabetGr
 
     @Override
     public AlphabetGridHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_alphabet, parent, false);
-        AlphabetGridHolder pvh = new AlphabetGridHolder(v);
+        View v;
+        boolean isFavourite = false;
+        if (viewType == TYPE_ITEM) {
+            v = LayoutInflater.from(mContext).inflate(R.layout.item_alphabet, parent, false);
+        } else {
+            v = LayoutInflater.from(mContext).inflate(R.layout.item_alphabet_favourate, parent, false);
+            isFavourite = true;
+        }
+        AlphabetGridHolder pvh = new AlphabetGridHolder(v,isFavourite);
         return pvh;
     }
 
     @Override
     public void onBindViewHolder(AlphabetGridHolder holder, final int position) {
-        M_AlphaCount m_alphaCount = (M_AlphaCount) array.get(position);
-        holder.tvAlpha.setText(m_alphaCount.getAlphabet());
-        holder.tvCount.setText(m_alphaCount.getCount() + "");
 
+        M_AlphaCount m_alphaCount = (M_AlphaCount) array.get(position);
+
+        if(!isPositionFavourite(position)) {
+            holder.tvAlpha.setText(m_alphaCount.getAlphabet());
+        }
+        holder.tvCount.setText(m_alphaCount.getCount() + "");
         holder.cv.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(final View v) {
-                onAlphabetListener.onAlphaClickListener(v,(M_AlphaCount)array.get(position));
+                onAlphabetListener.onAlphaClickListener(v, (M_AlphaCount) array.get(position));
             }
         });
 
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return isPositionFavourite(position) ? TYPE_FAVOURATE : TYPE_ITEM;
+    }
+
+    public boolean isPositionFavourite(int position) {
+        return (position == 0 && array.size() == 27);
     }
 
     @Override
