@@ -110,6 +110,7 @@ public class ActivityDisplayName extends AppCompatActivity {
     public boolean dispatchTouchEvent(MotionEvent event) {
         centerX = (int) event.getX();
         centerY = (int) event.getY();
+
         if (AppConstants.DEBUG)
             L.log(this, centerX + " " + centerY);
         return super.dispatchTouchEvent(event);
@@ -135,23 +136,13 @@ public class ActivityDisplayName extends AppCompatActivity {
         selectedAlphabet = getIntent().getStringExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET);
 
         String where = null;
-        Cursor c;
+        where = getNameSelectionQuery();
 
-        if (!selectedAlphabet.equalsIgnoreCase("Favourite")) {
-           where = getNameSelectionQuery();
+        Cursor c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
+                TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
+                TableContract.Name.GENDER_CAST}, where);
 
-            c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
-                    TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
-                    TableContract.Name.GENDER_CAST}, where);
-        } else {
-
-            c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]{TableContract.FavourateName.AUTO_ID,
-                    TableContract.FavourateName.NAME_EN, TableContract.FavourateName.NAME_MA, TableContract.FavourateName.NAME_FRE,
-                    TableContract.FavourateName.GENDER_CAST}, where);
-        }
-
-        if (c != null && c.getCount() > 0)
-        {
+        if (c != null && c.getCount() > 0) {
             if (AppConstants.DEBUG)
                 AppLogger.ToastLong(this, c.getCount() + "");
 
@@ -165,20 +156,11 @@ public class ActivityDisplayName extends AppCompatActivity {
         }
 
         /** This will find all wishlist of User*/
-        c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]
+        c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]{
+                TableContract.FavourateName.NAME_ID}, null);
+        mWishList = parseWishList(c);
 
-                {
-                        TableContract.FavourateName.NAME_ID
-                }
-
-                , null);
-        mWishList =
-
-                parseWishList(c);
-
-        bottomSheet = (BottomSheetLayout)
-
-                findViewById(R.id.bottomsheet);
+        bottomSheet = (BottomSheetLayout) findViewById(R.id.bottomsheet);
 
         /**
          * Implement Text Watcher

@@ -29,6 +29,15 @@
                 android:value=".ActivityAlphabetMain" />
 
         </activity>
+        <activity
+            android:theme="@style/Transparent"
+            android:name=".ActivityWishListDisplayName"
+            android:parentActivityName=".ActivityAlphabetMain">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ActivityAlphabetMain" />
+
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

@@ -1,20 +1,13 @@
 package in.sel.fragment;
 
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +18,11 @@ import in.sel.customview.MarginDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
 import in.sel.framework.OnAlphabetListener;
-import in.sel.indianbabyname.ActivityDisplayName;
 import in.sel.indianbabyname.ActivityAlphabetMain;
+import in.sel.indianbabyname.ActivityDisplayName;
+import in.sel.indianbabyname.ActivityWishListDisplayName;
 import in.sel.indianbabyname.R;
 import in.sel.model.M_AlphaCount;
-import in.sel.utility.AppConstants;
 
 public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener {
 
@@ -134,19 +127,17 @@ public class FragmentAlphabetHome extends Fragment implements OnAlphabetListener
 //
 //            @Override
 //            public void onAnimationEnd(Animator animation) {
-        Intent in = new Intent(getActivity(), ActivityDisplayName.class);
+        Intent in;
+        if (mAlphaCount.getAlphabet().equalsIgnoreCase("Favourite"))
+            in = new Intent(getActivity(), ActivityWishListDisplayName.class);
+        else {
+            in = new Intent(getActivity(), ActivityDisplayName.class);
+        }
         in.putExtra(ActivityAlphabetMain.SELECTED_ALPHA_BET, mAlphaCount.getAlphabet());
 
-        View sharedView = v;
-//                String transitionName = getString(R.string.square_orange_name);
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                    ActivityOptions transitionActivityOptions = ActivityOptions.makeSceneTransitionAnimation(getActivity(), sharedView, transitionName);
-//                    getActivity().startActivity(in, transitionActivityOptions.toBundle());
-//                } else {
         getActivity().startActivity(in);
         getActivity().overridePendingTransition(0, 0);
-        //         }
-//            }
+
 //
 //            @Override
 //            public void onAnimationCancel(Animator animation) {

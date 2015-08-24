@@ -29,10 +29,8 @@ import in.sel.utility.AppConstants;
 
 public class ActivityAlphabetMain extends AppCompatActivity {
 
+    public  String TAG = getClass().getName();
     public static final String SELECTED_ALPHA_BET = "alpha";
-    public static final String TAG = "ActivityMain";
-
-    //ListView lsView;
 
     private Toolbar toolbar;
 
@@ -54,7 +52,6 @@ public class ActivityAlphabetMain extends AppCompatActivity {
         centerY = (int) event.getY();
 
         //Toast.makeText(this, centerX + " " + centerY, Toast.LENGTH_LONG).show();
-
         return super.dispatchTouchEvent(event);
     }
 
