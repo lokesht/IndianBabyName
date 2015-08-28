@@ -22,7 +22,7 @@ import in.sel.model.M_Name;
 import in.sel.utility.AppConstants;
 import in.sel.utility.L;
 
-public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<FavouriteNameRecycleViewAdapter.MyViewHolder> {
+public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<FavouriteNameRecycleViewAdapter.MyViewHolder>{
 
     //keep track of the previous position for animations where scrolling down requires a different animation compared to scrolling up
     private int mPreviousPosition = 0;
@@ -142,6 +142,12 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
                 }
             });
         }
+    }
+
+
+    public void remove(int position) {
+        mWishList.remove(position);
+        notifyItemRemoved(position);
     }
 
 }

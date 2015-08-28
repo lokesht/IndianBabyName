@@ -40,6 +40,7 @@ import java.util.List;
 
 import in.sel.adapter.NameRecycleViewAdapter;
 import in.sel.customview.CustomDividerItemDecoration;
+import in.sel.customview.MarginDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
 import in.sel.framework.SimpleAnimationListener;
@@ -459,7 +460,8 @@ public class ActivityDisplayName extends AppCompatActivity {
     /** */
     public void displayList(List<M_Name> name) {
         recyclerView = (RecyclerView) findViewById(R.id.rv_frequency_list);
-        recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
+        //recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
+        recyclerView.addItemDecoration(new MarginDecoration(this));
 
         nameRecycleViewAdapter = new NameRecycleViewAdapter(this, name, mWishList);
         final VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);

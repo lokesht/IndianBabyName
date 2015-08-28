@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="in.sel.indianbabyname">
+
+    <uses-sdk tools:overrideLibrary="com.hudomju.swipe"/>
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:screenOrientation="portrait"
+
         android:theme="@style/AppTheme">
         <activity
             android:name=".ActivitySplash"
@@ -38,6 +42,8 @@
                 android:value=".ActivityAlphabetMain" />
 
         </activity>
+
+
     </application>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

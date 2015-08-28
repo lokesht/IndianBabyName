@@ -1,56 +1,34 @@
 package in.sel.indianbabyname;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewAnimationUtils;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.RadioGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.flipboard.bottomsheet.BottomSheetLayout;
-import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.hudomju.swipe.OnItemClickListener;
+import com.hudomju.swipe.SwipeToDismissTouchListener;
+import com.hudomju.swipe.SwipeableItemClickListener;
+import com.hudomju.swipe.adapter.RecyclerViewAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import in.sel.adapter.NameRecycleViewAdapter;
-import in.sel.customview.CustomDividerItemDecoration;
+import in.sel.adapter.FavouriteNameRecycleViewAdapter;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
-import in.sel.framework.HidingScrollListener;
 import in.sel.framework.SimpleAnimationListener;
 import in.sel.logging.AppLogger;
-import in.sel.model.EngNameAsc;
-import in.sel.model.FreNameAsc;
-import in.sel.model.HinNameAsc;
 import in.sel.model.M_Name;
-import in.sel.model.SortingValueHolder;
 import in.sel.utility.AppConstants;
-import in.sel.utility.L;
-import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 /**
  * Class is designed for Developer For Marking of Name
@@ -72,7 +50,7 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
     /**
      * Search Edit Box Edit
      */
-    private NameRecycleViewAdapter nameRecycleViewAdapter;
+    private FavouriteNameRecycleViewAdapter nameRecycleViewAdapter;
 
     private List<Integer> mWishList = new ArrayList<Integer>();
 
@@ -181,30 +159,60 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
     /** */
     public void displayList(List<M_Name> name) {
         recyclerView = (RecyclerView) findViewById(R.id.rv_frequency_list);
-        recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
+        //recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
 
-        nameRecycleViewAdapter = new NameRecycleViewAdapter(this, name, mWishList);
 
-        setRecyclerViewLayoutManager(recyclerView);
+        // ItemTouchHelper.
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+
+        nameRecycleViewAdapter = new FavouriteNameRecycleViewAdapter(this, name, mWishList);
         recyclerView.setAdapter(nameRecycleViewAdapter);
+
+        setRecyclerViewLayoutManager();
     }
 
     /**
      * Set RecyclerView's LayoutManager
      */
-    private void setRecyclerViewLayoutManager(RecyclerView recyclerView) {
-        int scrollPosition = 0;
+    private void setRecyclerViewLayoutManager() {
 
-        // If a layout manager has already been set, get current scroll position.
-        if (recyclerView.getLayoutManager() != null) {
-            scrollPosition =
-                    ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-        }
+        final SwipeToDismissTouchListener<RecyclerViewAdapter> touchListener =
+                new SwipeToDismissTouchListener<>(
+                        new RecyclerViewAdapter(recyclerView),
+                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewAdapter>() {
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return true;
+                            }
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+                            @Override
+                            public void onDismiss(RecyclerViewAdapter view, int position) {
+                                nameRecycleViewAdapter.remove(position);
+                            }
+                        });
 
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.scrollToPosition(scrollPosition);
+        recyclerView.setOnTouchListener(touchListener);
+        // Setting this scroll listener is required to ensure that during ListView scrolling,
+        // we don't look for swipes.
+        recyclerView.setOnScrollListener((RecyclerView.OnScrollListener) touchListener.makeScrollListener());
+        recyclerView.addOnItemTouchListener(new SwipeableItemClickListener(this,
+                new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        if (view.getId() == R.id.txt_delete) {
+                            touchListener.processPendingDismisses();
+                        } else if (view.getId() == R.id.txt_undo) {
+                            touchListener.undoPendingDismiss();
+                        } else { // R.id.txt_data
+                            Toast.makeText(ActivityWishListDisplayName.this, "Position " + position, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }));
+
+
+
     }
 
     /** */
