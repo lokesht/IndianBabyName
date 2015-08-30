@@ -23,6 +23,7 @@ import in.sel.adapter.FavouriteNameRecycleViewAdapter;
 import in.sel.customview.MarginDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
+import in.sel.framework.OnItemRemoveListener;
 import in.sel.framework.SimpleAnimationListener;
 import in.sel.logging.AppLogger;
 import in.sel.model.M_Name;
@@ -32,7 +33,7 @@ import in.sel.utility.AppConstants;
  * Class is designed for Developer For Marking of Name
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class ActivityWishListDisplayName extends AppCompatActivity implements OnFavItemRemoveListener{
+public class ActivityWishListDisplayName extends AppCompatActivity implements OnItemRemoveListener {
     private String TAG = getClass().getName();
 
     private RecyclerView recyclerView;

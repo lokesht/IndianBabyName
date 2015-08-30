@@ -16,6 +16,7 @@ import java.util.List;
 
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
+import in.sel.framework.OnItemRemoveListener;
 import in.sel.indianbabyname.R;
 import in.sel.model.M_Name;
 import in.sel.utility.AppConstants;
@@ -26,9 +27,9 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
     private List<M_Name> visibleObjects = Collections.emptyList();
     private LayoutInflater mInflater;
     private M_Name undoObject;
-    private OnFavItemRemoveListener onFavItemRemoveListener;
+    private OnItemRemoveListener onFavItemRemoveListener;
 private int mPreviousPos;
-    public FavouriteNameRecycleViewAdapter(Context context, List<M_Name> results, OnFavItemRemoveListener onFavItemRemoveListener) {
+    public FavouriteNameRecycleViewAdapter(Context context, List<M_Name> results, OnItemRemoveListener onFavItemRemoveListener) {
         this.onFavItemRemoveListener = onFavItemRemoveListener;
         visibleObjects = new ArrayList<>(results);
         mInflater = LayoutInflater.from(context);
