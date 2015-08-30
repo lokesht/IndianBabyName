@@ -14,18 +14,15 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.widget.Toast;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 import in.sel.adapter.FavouriteNameRecycleViewAdapter;
-import in.sel.customview.CustomDividerItemDecoration;
 import in.sel.customview.MarginDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
-import in.sel.framework.OnFavItemRemoveListener;
 import in.sel.framework.SimpleAnimationListener;
 import in.sel.logging.AppLogger;
 import in.sel.model.M_Name;

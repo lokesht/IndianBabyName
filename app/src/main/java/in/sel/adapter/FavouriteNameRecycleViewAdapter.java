@@ -14,10 +14,8 @@ import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
 
-import in.sel.anim.AnimationUtil;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
-import in.sel.framework.OnFavItemRemoveListener;
 import in.sel.indianbabyname.R;
 import in.sel.model.M_Name;
 import in.sel.utility.AppConstants;
