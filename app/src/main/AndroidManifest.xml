@@ -22,7 +22,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="in.sel.indianbabyname.ActivityAbout" />
+        <activity
+            android:label="@string/label_About"
+            android:name="in.sel.indianbabyname.ActivityAbout"
+            android:parentActivityName=".ActivityAlphabetMain">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ActivityAlphabetMain" />
+        </activity>
+
         <activity android:name=".ActivityAlphabetMain" />
         <activity
             android:theme="@style/Transparent"
@@ -34,6 +42,7 @@
 
         </activity>
         <activity
+            android:label="@string/label_Favourite"
             android:theme="@style/Transparent"
             android:name=".ActivityWishListDisplayName"
             android:parentActivityName=".ActivityAlphabetMain">

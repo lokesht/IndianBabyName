@@ -1,14 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/activity_margin_horizontal" >
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_about"
+    <include
+        android:id="@+id/tb_app_bar"
+        layout="@layout/app_bar" />
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/about_info" />
 
-</ScrollView>
+        android:padding="@dimen/default_padding">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_about"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/about_info" />
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="0,1,2">
+
+
+                <TableRow
+                    android:paddingRight="@dimen/default_padding"
+                    android:paddingLeft="@dimen/default_padding"
+                    android:background="@color/colorAccent"
+                    android:gravity="center_vertical"
+                    android:minHeight="45dp">
+
+                    <TextView android:text="ENGLISH" />
+
+                    <TextView android:text="MARATHI" />
+
+                    <TextView android:text="FREQUENCY" />
+                </TableRow>
+
+                <TableRow
+                    android:paddingRight="@dimen/default_padding"
+                    android:paddingLeft="@dimen/default_padding">
+
+                    <TextView android:text="MEENA" />
+
+                    <TextView android:text=" मीना" />
+
+                    <TextView android:text="54050" />
+                </TableRow>
+
+                <TableRow
+                    android:paddingRight="@dimen/default_padding"
+                    android:paddingLeft="@dimen/default_padding">
+
+                    <TextView android:text="ABC" />
+
+                    <TextView android:text=" मिना" />
+
+                    <TextView android:text="8209" />
+                </TableRow>
+
+                <TableRow
+                    android:paddingRight="@dimen/default_padding"
+                    android:paddingLeft="@dimen/default_padding">
+
+                    <TextView android:text="ABC" />
+
+                    <TextView android:text=" मीणा" />
+
+                    <TextView android:text="194" />
+                </TableRow>
+
+                <TableRow
+                    android:paddingRight="@dimen/default_padding"
+                    android:paddingLeft="@dimen/default_padding">
+
+                    <TextView android:text="ABC" />
+
+                    <TextView android:text=" मिणा" />
+
+                    <TextView android:text="14" />
+                </TableRow>
+
+            </TableLayout>
+
+
+            <TextView
+                android:layout_marginTop="@dimen/default_padding"
+                android:id="@+id/tv_about_2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/about_info" />
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="0,1,2">
+
+
+                <TableRow
+                    android:paddingRight="@dimen/default_padding"
+                    android:paddingLeft="@dimen/default_padding"
+                    android:background="@color/colorAccent"
+                    android:gravity="center_vertical"
+                    android:minHeight="45dp">
+
+                    <TextView android:text="ENGLISH" />
+
+                    <TextView android:text="MARATHI" />
+
+                    <TextView android:text="FREQUENCY" />
+                </TableRow>
+
+                <TableRow
+                    android:paddingRight="@dimen/default_padding"
+                    android:paddingLeft="@dimen/default_padding">
+
+                    <TextView android:text="MEENA" />
+
+                    <TextView android:text=" मीना" />
+
+                    <TextView android:text="62467" />
+                </TableRow>
+
+
+            </TableLayout>
+            <TextView
+                android:layout_marginTop="@dimen/default_padding"
+                android:id="@+id/tv_thax"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/thanx" />
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>
