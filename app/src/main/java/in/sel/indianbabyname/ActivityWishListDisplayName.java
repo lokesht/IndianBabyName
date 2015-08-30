@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import in.sel.adapter.FavouriteNameRecycleViewAdapter;
+import in.sel.customview.CustomDividerItemDecoration;
+import in.sel.customview.MarginDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
 import in.sel.framework.SimpleAnimationListener;
@@ -52,17 +54,15 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
      */
     private FavouriteNameRecycleViewAdapter nameRecycleViewAdapter;
 
-    private List<Integer> mWishList = new ArrayList<Integer>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {/**/
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wish_list_recycle_view);
 
-        init();
+        initialize();
     }
 
-    private void init() {
+    private void initialize() {
 
         setupWindowAnimations();
 
@@ -75,7 +75,7 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
 
         String where = null;
         Cursor c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]{TableContract.FavourateName.AUTO_ID,
-                TableContract.FavourateName.NAME_EN, TableContract.FavourateName.NAME_MA, TableContract.FavourateName.NAME_FRE,
+                TableContract.FavourateName.NAME_EN, TableContract.FavourateName.NAME_MA, TableContract.FavourateName.NAME_FRE, TableContract.FavourateName.NAME_ID,
                 TableContract.FavourateName.GENDER_CAST}, where);
 
         if (c != null && c.getCount() > 0) {
@@ -86,10 +86,10 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
             displayList(lsName);
         }
 
-        /** This will find all wishlist of User*/
-        c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]{
-                TableContract.FavourateName.NAME_ID}, null);
-        mWishList = parseWishList(c);
+//        /** This will find all wishlist of User*/
+//        c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]{
+//                TableContract.FavourateName.NAME_ID}, null);
+//        mWishList = parseWishList(c);
 
     }
 
@@ -159,15 +159,14 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
     /** */
     public void displayList(List<M_Name> name) {
         recyclerView = (RecyclerView) findViewById(R.id.rv_frequency_list);
-        //recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
-
+        recyclerView.addItemDecoration(new MarginDecoration(this,getResources().getDimensionPixelOffset(R.dimen.small_margin)));
 
         // ItemTouchHelper.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
 
-        nameRecycleViewAdapter = new FavouriteNameRecycleViewAdapter(this, name, mWishList);
+        nameRecycleViewAdapter = new FavouriteNameRecycleViewAdapter(this, name);
         recyclerView.setAdapter(nameRecycleViewAdapter);
 
         setRecyclerViewLayoutManager();
@@ -212,7 +211,6 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
                 }));
 
 
-
     }
 
     /** */
@@ -221,13 +219,14 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
         if (c != null && c.getCount() > 0) {
             c.moveToFirst();
             do {
-                int id = c.getInt(c.getColumnIndex(TableContract.Name.AUTO_ID));
+               //int id = c.getInt(c.getColumnIndex(TableContract.FavourateName.AUTO_ID));
+                int id = c.getInt(c.getColumnIndex(TableContract.FavourateName.NAME_ID));
 
-                String en = c.getString(c.getColumnIndex(TableContract.Name.NAME_EN));
-                String ma = c.getString(c.getColumnIndex(TableContract.Name.NAME_MA));
-                int fre = c.getInt(c.getColumnIndex(TableContract.Name.NAME_FRE));
+                String en = c.getString(c.getColumnIndex(TableContract.FavourateName.NAME_EN));
+                String ma = c.getString(c.getColumnIndex(TableContract.FavourateName.NAME_MA));
+                int fre = c.getInt(c.getColumnIndex(TableContract.FavourateName.NAME_FRE));
 
-                String s = c.getString(c.getColumnIndex(TableContract.Name.GENDER_CAST));
+                String s = c.getString(c.getColumnIndex(TableContract.FavourateName.GENDER_CAST));
 
 				/* Considering default value as -1 */
                 String desc = "-1";
@@ -239,7 +238,6 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
 
                     desc = s;
                 }
-
                 M_Name temp = new M_Name(ma, en, fre, id, desc);
                 lsName.add(temp);
             } while (c.moveToNext());
@@ -250,21 +248,22 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
         return lsName;
     }
 
-    private List<Integer> parseWishList(Cursor c) {
-
-        if (c != null && c.moveToFirst()) {
-            do {
-                Integer in = c.getInt(0);
-                mWishList.add(in);
-            } while (c.moveToNext());
-            c.close();
-        }
-        return mWishList;
-    }
+//    private List<Integer> parseWishList(Cursor c) {
+//
+//        if (c != null && c.moveToFirst()) {
+//            do {
+//                Integer in = c.getInt(0);
+//                mWishList.add(in);
+//            } while (c.moveToNext());
+//            c.close();
+//        }
+//        return mWishList;
+//    }
 
     @Override
     protected void onDestroy() {
-        dbHelper.close();
+        if (dbHelper != null)
+            dbHelper.close();
         super.onDestroy();
     }
 }

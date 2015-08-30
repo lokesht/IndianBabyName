@@ -35,6 +35,7 @@
 
     <dimen name="scroll_width">30dp</dimen>
     <dimen name="default_padding">8dp</dimen>
+    <dimen name="small_margin">4dp</dimen>
 
     <dimen name="circle_size">90dp</dimen>
 

@@ -29,7 +29,7 @@ import in.sel.utility.Utility;
 public class DBHelper extends SQLiteOpenHelper {
 
     /** */
-    private String TAG = "DatabaseHelper";
+    private String TAG = getClass().getName();
 
     /** */
     private SQLiteDatabase db;
@@ -37,35 +37,42 @@ public class DBHelper extends SQLiteOpenHelper {
     /**
      * If you change the database schema, you must increment the database version.
      */
-    public static final int DATABASE_VERSION = 1;
+    public static int DATABASE_VERSION = 1;
     public static final String DB_NAME = "BabyName.sqlite";
 
     public static final String DB_SUFFIX = "/databases/";
-    Context myContext;
+    private Context myContext;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VERSION);
         this.myContext = context;
 
-        // DB_PATH =
-        // Environment.getExternalStorageDirectory()+"/Test/AndroidBabyName/";
+        // DB_PATH = Environment.getExternalStorageDirectory()+"/Test/AndroidBabyName/";
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-//            db.execSQL(TableContract.FavourateName.SQL_CREATE);
-//            db.execSQL(TableContract.TimeStamp.SQL_CREATE);
-//            db.execSQL(TableContract.Name.SQL_CREATE);
-//
+            this.db = db;
+            // db.setVersion(2);
+            db.execSQL(TableContract.FavourateName.SQL_CREATE);
+            //   db.execSQL(TableContract.Name.SQL_CREATE);
             if (AppConstants.DEVELOER)
-                Log.i(TAG, "Database created Successfully");
+                Log.i(TAG, TableContract.FavourateName.SQL_CREATE + "Database created Successfully");
         } catch (Exception e) {
             if (AppConstants.DEBUG)
                 Log.e(TAG, e.toString());
-            AppLogger.writeLog("Class Name --> DBHelper -- " + e.toString());
+            // AppLogger.writeLog("Class Name --> DBHelper -- " + e.toString());
         }
     }
+
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if(newVersion==2)
+        db.execSQL(TableContract.FavourateName.SQL_CREATE);
+    }
+
 
     /**
      * Identify Database is available or Not
@@ -79,7 +86,8 @@ public class DBHelper extends SQLiteOpenHelper {
             }
 
         } catch (SQLiteException e) {
-            Log.v(TAG, e.toString() + "   database doesn't exists yet..");
+            if (AppConstants.DEBUG)
+                Log.e(TAG, e.toString() + "   database doesn't exists yet..");
         }
         return false;
     }
@@ -125,19 +133,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public boolean openDataBase() throws SQLException {
         String myPath = getDatabasePath();
         db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+
         return db != null;
-    }
-
-    @Override
-    public synchronized void close() {
-        if (db != null)
-            db.close();
-        super.close();
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 
     /**
@@ -370,7 +367,8 @@ public class DBHelper extends SQLiteOpenHelper {
             db.close();
             // this.db.setLockingEnabled(true);
         }
-        Log.i("InsertTime", t.getTime(t));
+        if (AppConstants.DEBUG)
+            Log.i("InsertTime", t.getTime(t));
         return rowid;
     }
 

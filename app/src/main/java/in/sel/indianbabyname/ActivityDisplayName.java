@@ -95,6 +95,7 @@ public class ActivityDisplayName extends AppCompatActivity {
 
     private SortingValueHolder mSortingValueHolder;
     private SortingValueHolder mSecondarySortingValueHolder;
+
     private List<M_Name> visibleObjects;
     private FloatingActionButton mFabActionButton;
     private List<Integer> mWishList = new ArrayList<Integer>();
@@ -120,7 +121,7 @@ public class ActivityDisplayName extends AppCompatActivity {
     private void init() {
 
         /* Default Object*/
-        mSortingValueHolder = new SortingValueHolder(true);
+        mSortingValueHolder = new SortingValueHolder();
 
         /** */
         setupLayout();
@@ -167,7 +168,6 @@ public class ActivityDisplayName extends AppCompatActivity {
          * Implement Text Watcher
          */
         onSearchListener();
-
     }
 
     public void showBottomSheet() {
@@ -179,6 +179,7 @@ public class ActivityDisplayName extends AppCompatActivity {
             sortAndFilter();
         }
 
+        setUpSheetView(mSortingValueHolder);
         mSecondarySortingValueHolder = new SortingValueHolder(mSortingValueHolder);
         bottomSheet.showWithSheetView(bottomSheetView);
     }
@@ -203,7 +204,13 @@ public class ActivityDisplayName extends AppCompatActivity {
                 }
 
             visibleObjects = new ArrayList<>();
-            List<Integer> test = mSecondarySortingValueHolder.getGenderCategory();
+
+            /* */
+            List<Integer> test = new ArrayList<>();
+            if (mSecondarySortingValueHolder.isMaleSelected())
+                test.add(0);
+            if (mSecondarySortingValueHolder.isFemaleSelected())
+                test.add(1);
 
             for (M_Name item : lsName) {
                 String temp = item.getGender_cast();
@@ -212,10 +219,39 @@ public class ActivityDisplayName extends AppCompatActivity {
                     visibleObjects.add(item);
             }
 
-            nameRecycleViewAdapter.setSort(visibleObjects);
-            mSecondarySortingValueHolder = mSortingValueHolder;
+            nameRecycleViewAdapter.setVisibleObjects(visibleObjects);
+            mSortingValueHolder = mSecondarySortingValueHolder;
         }
         bottomSheet.dismissSheet();
+    }
+
+    private void setUpSheetView(SortingValueHolder mSortingValueHolder) {
+
+        CheckBox cbMale = (CheckBox) bottomSheetView.findViewById(R.id.cb_male);
+        CheckBox cbFemale = (CheckBox) bottomSheetView.findViewById(R.id.cb_female);
+
+        RadioGroup radioGroup = (RadioGroup) bottomSheetView.findViewById(R.id.rg_sorting);
+        /** */
+        switch (mSortingValueHolder.getSortingColumn()) {
+            case TableContract.Name.NAME_EN:
+                radioGroup.check(R.id.rb_eng_name);
+                break;
+
+            case TableContract.Name.NAME_MA:
+                radioGroup.check(R.id.rb_hind_name);
+                break;
+
+            case TableContract.Name.NAME_FRE:
+                radioGroup.check(R.id.rb_frequency);
+                break;
+        }
+
+            /* */
+        if (mSortingValueHolder.isMaleSelected())
+            cbMale.setChecked(true);
+        if (mSortingValueHolder.isFemaleSelected())
+            cbFemale.setChecked(true);
+
     }
 
     private void sortAndFilter() {
@@ -227,20 +263,26 @@ public class ActivityDisplayName extends AppCompatActivity {
             }
         });
 
-        CheckBox cbMale = (CheckBox) bottomSheetView.findViewById(R.id.cb_male);
-        CheckBox cbFemale = (CheckBox) bottomSheetView.findViewById(R.id.cb_female);
-        CheckBox cbTransGender = (CheckBox) bottomSheetView.findViewById(R.id.cb_transgender);
+        final CheckBox cbMale = (CheckBox) bottomSheetView.findViewById(R.id.cb_male);
+        final CheckBox cbFemale = (CheckBox) bottomSheetView.findViewById(R.id.cb_female);
+        //CheckBox cbTransGender = (CheckBox) bottomSheetView.findViewById(R.id.cb_transgender);
 
         cbMale.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSecondarySortingValueHolder.getGenderCategory().remove(0);
+
                 if (isChecked) {
-                    mSecondarySortingValueHolder.getGenderCategory().add(0, 0);
+                    mSecondarySortingValueHolder.setIsMaleSelected(true);
                     // L.log(ActivityDisplayName.this, mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
                 } else {
-                    mSecondarySortingValueHolder.getGenderCategory().add(0, -1);
-                    // L.log(ActivityDisplayName.this,mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
+                    if (!mSecondarySortingValueHolder.isFemaleSelected()) {
+                        mSecondarySortingValueHolder.setIsMaleSelected(true);
+                        cbMale.setChecked(true);
+                        L.lshow(ActivityDisplayName.this, getResources().getString(R.string.msg_either_of_one_must_be_selected));
+                    } else {
+                        mSecondarySortingValueHolder.setIsMaleSelected(false);
+                    }
+
                 }
 
             }
@@ -249,29 +291,36 @@ public class ActivityDisplayName extends AppCompatActivity {
         cbFemale.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSecondarySortingValueHolder.getGenderCategory().remove(1);
+
                 if (isChecked) {
-                    // L.log(ActivityDisplayName.this,mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
-                    mSecondarySortingValueHolder.getGenderCategory().add(1, 1);
-                } else {
-                    mSecondarySortingValueHolder.getGenderCategory().add(1, -1);
+                    mSecondarySortingValueHolder.setIsFemaleSelected(true);
                     // L.log(ActivityDisplayName.this, mSecondarySortingValueHolder.getGenderCategory().size() + " " + mSortingValueHolder.getGenderCategory().size());
-                }
-            }
-        });
-
-        cbTransGender.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSecondarySortingValueHolder.getGenderCategory().remove(2);
-
-                if (isChecked) {
-                    mSecondarySortingValueHolder.getGenderCategory().add(2, 2);
                 } else {
-                    mSecondarySortingValueHolder.getGenderCategory().add(2, -1);
+                    if (!mSecondarySortingValueHolder.isMaleSelected()) {
+                        mSecondarySortingValueHolder.setIsFemaleSelected(true);
+                        cbFemale.setChecked(true);
+                        L.lshow(ActivityDisplayName.this, getResources().getString(R.string.msg_either_of_one_must_be_selected));
+                    } else {
+                        mSecondarySortingValueHolder.setIsFemaleSelected(false);
+                    }
+
                 }
+
             }
         });
+
+//        cbTransGender.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                mSecondarySortingValueHolder.getGenderCategory().remove(2);
+//
+//                if (isChecked) {
+//                    mSecondarySortingValueHolder.getGenderCategory().add(2, 2);
+//                } else {
+//                    mSecondarySortingValueHolder.getGenderCategory().add(2, -1);
+//                }
+//            }
+//        });
 
         //sortingColumn
         RadioGroup radioGroup = (RadioGroup) bottomSheetView.findViewById(R.id.rg_sorting);
@@ -440,28 +489,28 @@ public class ActivityDisplayName extends AppCompatActivity {
 //        anim.start();
     }
 
-    private void animateRevealHide(final View viewRoot) {
-        int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
-        int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
-        int initialRadius = viewRoot.getWidth();
-
-        Animator anim = ViewAnimationUtils.createCircularReveal(viewRoot, cx, cy, initialRadius, 0);
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                viewRoot.setVisibility(View.INVISIBLE);
-            }
-        });
-        anim.setDuration(AppConstants.ANIM_DURATION);
-        anim.start();
-    }
+//    private void animateRevealHide(final View viewRoot) {
+//        int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
+//        int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
+//        int initialRadius = viewRoot.getWidth();
+//
+//        Animator anim = ViewAnimationUtils.createCircularReveal(viewRoot, cx, cy, initialRadius, 0);
+//        anim.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                super.onAnimationEnd(animation);
+//                viewRoot.setVisibility(View.INVISIBLE);
+//            }
+//        });
+//        anim.setDuration(AppConstants.ANIM_DURATION);
+//        anim.start();
+//    }
 
     /** */
     public void displayList(List<M_Name> name) {
         recyclerView = (RecyclerView) findViewById(R.id.rv_frequency_list);
-        //recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
-        recyclerView.addItemDecoration(new MarginDecoration(this));
+        recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, null));
+        //recyclerView.addItemDecoration(new MarginDecoration(this));
 
         nameRecycleViewAdapter = new NameRecycleViewAdapter(this, name, mWishList);
         final VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) findViewById(R.id.fast_scroller);

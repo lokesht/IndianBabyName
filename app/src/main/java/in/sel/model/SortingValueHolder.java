@@ -9,35 +9,36 @@ import in.sel.dbhelper.TableContract;
 /**
  * Created by Lokesh on 22-08-2015.
  */
-public class SortingValueHolder  {
+public class SortingValueHolder {
 
-    private List<Integer> genderCategory = new ArrayList<>(3);
     private String sortingColumn = TableContract.Name.NAME_FRE;
+    private boolean isMaleSelected = true;
+    private boolean isFemaleSelected = true;
 
-    public SortingValueHolder(boolean isIncludeCategory) {
+    public boolean isMaleSelected() {
+        return isMaleSelected;
+    }
 
-        if (isIncludeCategory) {
-            genderCategory.add(0, 0);
-            genderCategory.add(1, 1);
-            genderCategory.add(2, 2);
+    public void setIsMaleSelected(boolean isMaleSelected) {
+        this.isMaleSelected = isMaleSelected;
+    }
 
-            setSortingColumn(sortingColumn);
-        }
+    public boolean isFemaleSelected() {
+        return isFemaleSelected;
+    }
+
+    public void setIsFemaleSelected(boolean isFemaleSelected) {
+        this.isFemaleSelected = isFemaleSelected;
+    }
+
+    public SortingValueHolder() {
     }
 
     /* Copy Constructer*/
-    public SortingValueHolder(SortingValueHolder sortingValueHolder)
-    {
-        this.genderCategory.addAll(sortingValueHolder.getGenderCategory());
+    public SortingValueHolder(SortingValueHolder sortingValueHolder) {
         this.sortingColumn = sortingValueHolder.getSortingColumn();
-    }
-
-    public List<Integer> getGenderCategory() {
-        return genderCategory;
-    }
-
-    public void setGenderCategory(List<Integer> genderCategory) {
-        this.genderCategory = genderCategory;
+        this.isFemaleSelected = sortingValueHolder.isFemaleSelected();
+        this.isMaleSelected = sortingValueHolder.isMaleSelected();
     }
 
     public String getSortingColumn() {
@@ -55,28 +56,18 @@ public class SortingValueHolder  {
 
     @Override
     public boolean equals(Object o) {
-
         if (o != null && o instanceof SortingValueHolder) {
-            SortingValueHolder sortingValueHolder = (SortingValueHolder) o;
-            if (this.getGenderCategory().size() != sortingValueHolder.getGenderCategory().size()) {
+            SortingValueHolder temp = (SortingValueHolder) o;
+            if (this.isMaleSelected() != temp.isMaleSelected())
                 return false;
-            }
-
-            List<Integer> t1 = new ArrayList<>(getGenderCategory());
-            List<Integer> t2 = new ArrayList<>(sortingValueHolder.getGenderCategory());
-
-            Collections.sort(t1);
-            Collections.sort(t2);
-
-            if (!t1.equals(t2))
+            if (this.isFemaleSelected() != temp.isFemaleSelected())
                 return false;
-
-            if (!getSortingColumn().equalsIgnoreCase(sortingValueHolder.getSortingColumn()))
+            if (!this.getSortingColumn().equalsIgnoreCase(temp.getSortingColumn()))
                 return false;
 
             return true;
-
         }
+
         return super.equals(o);
     }
 }

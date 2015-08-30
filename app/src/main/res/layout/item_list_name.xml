@@ -1,87 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ll_item"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:paddingBottom="2dp"
+    android:paddingLeft="@dimen/margin_small"
+    android:paddingRight="@dimen/scroll_width"
+    android:paddingTop="2dp">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:paddingLeft="@dimen/margin_small"
-        android:paddingRight="@dimen/scroll_width">
+        android:layout_toLeftOf="@+id/ivSmily"
+        android:stretchColumns="1,2">
 
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/ivSmily"
-            android:stretchColumns="1,2">
+        <TableRow android:paddingTop="@dimen/margin_small">
 
-            <TableRow android:paddingTop="@dimen/margin_small">
+            <TextView
+                android:id="@+id/tv_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="50dp"
+                android:text="count"
+                android:textColor="@color/colorDivider" />
 
-                <TextView
-                    android:id="@+id/tv_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="50dp"
-                    android:text="count"
-                    android:textColor="@color/colorDivider" />
+            <TextView
+                android:id="@+id/c1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:gravity="left|center_vertical"
+                android:minWidth="120dp"
+                android:text="@string/hello_world"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="@dimen/abc_text_size_body_1_material" />
 
-                <TextView
-                    android:id="@+id/c1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left|center_vertical"
-                    android:gravity="left|center_vertical"
-                    android:minWidth="120dp"
-                    android:text="@string/hello_world"
-                    android:textAllCaps="true"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="@dimen/abc_text_size_body_1_material" />
+            <TextView
+                android:id="@+id/c2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:gravity="left|center_vertical"
+                android:minWidth="120dp"
+                android:text="@string/hello_world"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="@dimen/abc_text_size_subhead_material" />
 
-                <TextView
-                    android:id="@+id/c2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left|center_vertical"
-                    android:gravity="left|center_vertical"
-                    android:minWidth="120dp"
-                    android:text="@string/hello_world"
-                    android:textAllCaps="true"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="@dimen/abc_text_size_subhead_material" />
+        </TableRow>
 
-            </TableRow>
+        <TableRow
+            android:paddingBottom="@dimen/margin_small"
+            android:paddingTop="@dimen/margin_small">
 
-            <TableRow
-                android:paddingBottom="@dimen/margin_small"
-                android:paddingTop="@dimen/margin_small">
+            <TextView
+                android:id="@+id/c3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_span="2"
+                android:paddingLeft="80dp"
+                android:text="@string/name_frequency"
+                android:textColor="@color/colorSecondaryText"
+                android:textSize="@dimen/ts_small" />
 
-                <TextView
-                    android:id="@+id/c3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="1"
-                    android:layout_span="2"
-                    android:paddingLeft="80dp"
-                    android:text="@string/name_frequency"
-                    android:textColor="@color/colorSecondaryText"
-                    android:textSize="@dimen/ts_small" />
+        </TableRow>
 
-            </TableRow>
+    </TableLayout>
 
-        </TableLayout>
+    <ImageView
+        android:id="@+id/ivSmily"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/default_padding"
+        android:src="@mipmap/ic_favorite_border_black_24dp"
+        android:tint="@color/colorAccent" />
+</RelativeLayout>
 
-        <ImageView
-            android:id="@+id/ivSmily"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:padding="@dimen/default_padding"
-            android:src="@mipmap/ic_favorite_border_black_24dp"
-            android:tint="@color/colorAccent" />
-    </RelativeLayout>
-
-</android.support.v7.widget.CardView>

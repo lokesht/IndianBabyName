@@ -121,9 +121,9 @@ public class ActivityAlphabetMain extends AppCompatActivity {
                 startActivity(in);
                 break;
 
-            case R.id.action_database_copy:
-                writeDataBase();
-                break;
+//            case R.id.action_database_copy:
+//                writeDataBase();
+//                break;
         }
 
         return super.onOptionsItemSelected(item);

@@ -38,7 +38,7 @@
                         android:id="@+id/cv_search"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:visibility="gone">
+                        android:visibility="invisible">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -119,8 +119,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             fab:fab_plusIconColor="@color/half_black"
-            android:tint="@color/Red"
-            fab:fab_colorNormal="@color/colorAccent"
+            android:tint="@color/White"
+            fab:fab_colorNormal="@color/Blue_dark"
             android:src="@mipmap/ic_filter_list_black_24dp"
             fab:fab_colorPressed="@color/white_pressed"
             android:layout_alignParentLeft="true"

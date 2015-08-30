@@ -164,7 +164,7 @@ public class NameRecycleViewAdapter extends RecyclerView.Adapter<NameRecycleView
     /**
      * Sort
      */
-    public void setSort(List<M_Name> lsName) {
+    public void setVisibleObjects(List<M_Name> lsName) {
         visibleObjects = new ArrayList<>();
         visibleObjects.addAll(lsName);
         notifyDataSetChanged();

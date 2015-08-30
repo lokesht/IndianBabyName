@@ -16,14 +16,14 @@ public class L extends Application {
 
     private static final String TAG = "Logger";
 
-    public static void sToast(Context context) {
+    public static void sToastTest(Context context) {
         Toast.makeText(context, "Test", Toast.LENGTH_SHORT).show();
     }
 
 
     public static void log(Context context, String msg) {
-        //Log.i(TAG, msg);
-       Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        Log.i(TAG, msg);
+      // Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
     public static void log(Context context, String tag, String msg) {
@@ -31,10 +31,12 @@ public class L extends Application {
     }
 
     public static void LShow(Context context, String msg) {
-        Log.i(TAG, msg);
+        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        //Log.i(TAG, msg);
     }
 
     public static void lshow(Context context, String msg) {
-        Log.i(TAG, msg);
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+       // Log.i(TAG, msg);
     }
 }

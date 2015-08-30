@@ -22,22 +22,19 @@ import in.sel.model.M_Name;
 import in.sel.utility.AppConstants;
 import in.sel.utility.L;
 
-public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<FavouriteNameRecycleViewAdapter.MyViewHolder>{
+public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<FavouriteNameRecycleViewAdapter.MyViewHolder> {
 
     //keep track of the previous position for animations where scrolling down requires a different animation compared to scrolling up
     private int mPreviousPosition = 0;
 
     private List<M_Name> visibleObjects = Collections.emptyList();
-    List<Integer> mWishList = Collections.emptyList();
-
     private LayoutInflater mInflater;
+    private M_Name undoObject;
 
-    public FavouriteNameRecycleViewAdapter(Context context, List<M_Name> results, List<Integer> wishList) {
+    public FavouriteNameRecycleViewAdapter(Context context, List<M_Name> results) {
 
         visibleObjects = new ArrayList<>(results);
-
         mInflater = LayoutInflater.from(context);
-        mWishList = wishList;
     }
 
     @Override
@@ -48,7 +45,7 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View view = mInflater.inflate(R.layout.item_list_name, parent, false);
+        View view = mInflater.inflate(R.layout.item_favourite_list_name, parent, false);
         MyViewHolder holder = new MyViewHolder(view);
         return holder;
     }
@@ -74,19 +71,15 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
             Formatter count = formatter.format("% 5d", (position + 1));
             holder.c4.setText(count.toString());
 
-            if (mWishList.contains(visibleObjects.get(position).getId())) {
-                holder.ivSmile.setImageResource(R.mipmap.ic_favorite_black_24dp);
-            } else {
-                holder.ivSmile.setImageResource(R.mipmap.ic_favorite_border_black_24dp);
-            }
+            holder.ivSmile.setImageResource(R.mipmap.ic_favorite_black_24dp);
 
-           /*** Animate Recycle View*/
-			if(position<mPreviousPosition)
-			{
-				AnimationUtil.animateHeal(holder, false);
-			}else{
-				AnimationUtil.animateHeal(holder, true);
-			}
+
+            /*** Animate Recycle View*/
+            if (position < mPreviousPosition) {
+                AnimationUtil.animateHeal(holder, false);
+            } else {
+                AnimationUtil.animateHeal(holder, true);
+            }
             mPreviousPosition = position;
         }
     }
@@ -113,32 +106,11 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
                 @Override
                 public void onClick(View v) {
 
-                    DBHelper dbh = new DBHelper(mInflater.getContext());
+                    ivSmile.setImageResource(R.mipmap.ic_favorite_border_black_24dp);
+
                     int position = getLayoutPosition();
-                    Integer id = visibleObjects.get(position).getId();
-                    if (mWishList.contains(id)) {
-                        ivSmile.setImageResource(R.mipmap.ic_favorite_border_black_24dp);
-                        mWishList.remove(id);
+                    remove(position);
 
-                        String where = TableContract.FavourateName.NAME_ID + " = " + id;
-                        dbh.deleteRow(TableContract.FavourateName.TABLE_NAME, where);
-
-                    } else {
-                        ivSmile.setImageResource(R.mipmap.ic_favorite_black_24dp);
-
-                        ContentValues cv = new ContentValues();
-                        cv.put(TableContract.FavourateName.NAME_EN,visibleObjects.get(position).getName_en());
-                        cv.put(TableContract.FavourateName.NAME_MA,visibleObjects.get(position).getName_ma());
-                        cv.put(TableContract.FavourateName.NAME_FRE,visibleObjects.get(position).getFrequency());
-                        cv.put(TableContract.FavourateName.GENDER_CAST,visibleObjects.get(position).getGender_cast());
-                        cv.put(TableContract.FavourateName.NAME_ID,visibleObjects.get(position).getId());
-
-                        long tempId = dbh.insertInTable(TableContract.FavourateName.TABLE_NAME,null,cv);
-                        mWishList.add(id);
-
-                    }
-
-                    dbh.close();
                 }
             });
         }
@@ -146,8 +118,33 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
 
 
     public void remove(int position) {
-        mWishList.remove(position);
+
+        undoObject = visibleObjects.get(position);
+
+        DBHelper dbh = new DBHelper(mInflater.getContext());
+        String where = TableContract.FavourateName.NAME_ID + " = " + visibleObjects.get(position).getId();
+        dbh.deleteRow(TableContract.FavourateName.TABLE_NAME, where);
+
+        visibleObjects.remove(position);
         notifyItemRemoved(position);
+        if (dbh != null)
+            dbh.close();
     }
 
+    private void addUndo(int position, M_Name name) {
+        DBHelper dbh = new DBHelper(mInflater.getContext());
+        ContentValues cv = new ContentValues();
+        cv.put(TableContract.FavourateName.NAME_EN, name.getName_en());
+        cv.put(TableContract.FavourateName.NAME_MA, name.getName_ma());
+        cv.put(TableContract.FavourateName.NAME_FRE, name.getFrequency());
+        cv.put(TableContract.FavourateName.GENDER_CAST, name.getGender_cast());
+        cv.put(TableContract.FavourateName.NAME_ID, name.getId());
+
+        long tempId = dbh.insertInTable(TableContract.FavourateName.TABLE_NAME, null, cv);
+        visibleObjects.add(position, name);
+        notifyItemRemoved(position);
+
+        if (dbh != null)
+            dbh.close();
+    }
 }
