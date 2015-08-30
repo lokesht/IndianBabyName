@@ -60,4 +60,6 @@ Thanks for downloading.
     <string name="copy_database">copy_database</string>
 
 	<string name="msg_either_of_one_must_be_selected">At least one should be selected</string>
+	<string name="msg_item_removed">Item removed</string>
+
 </resources>

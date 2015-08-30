@@ -1,32 +1,40 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/snackbarPosition"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_alignParentBottom="true"
+    android:layout_centerHorizontal="true">
 
-    <LinearLayout
-        android:id="@+id/container"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/White"
-        android:visibility="invisible">
+        android:layout_height="match_parent">
 
-
-        <include
-            android:id="@+id/tb_app_bar"
-            layout="@layout/app_bar" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_frequency_list"
+        <LinearLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@color/White"
+            android:orientation="vertical"
+            android:visibility="invisible">
 
 
-    </LinearLayout>
+            <include
+                android:id="@+id/tb_app_bar"
+                layout="@layout/app_bar" />
 
-    <View
-        android:id="@+id/view_cover_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
-        android:visibility="invisible" />
-</FrameLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_frequency_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view_cover_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:visibility="invisible" />
+    </FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

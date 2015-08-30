@@ -6,18 +6,16 @@ import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.Toast;
 
-import com.hudomju.swipe.OnItemClickListener;
-import com.hudomju.swipe.SwipeToDismissTouchListener;
-import com.hudomju.swipe.SwipeableItemClickListener;
-import com.hudomju.swipe.adapter.RecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +25,7 @@ import in.sel.customview.CustomDividerItemDecoration;
 import in.sel.customview.MarginDecoration;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
+import in.sel.framework.OnFavItemRemoveListener;
 import in.sel.framework.SimpleAnimationListener;
 import in.sel.logging.AppLogger;
 import in.sel.model.M_Name;
@@ -36,7 +35,7 @@ import in.sel.utility.AppConstants;
  * Class is designed for Developer For Marking of Name
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class ActivityWishListDisplayName extends AppCompatActivity {
+public class ActivityWishListDisplayName extends AppCompatActivity implements OnFavItemRemoveListener{
     private String TAG = getClass().getName();
 
     private RecyclerView recyclerView;
@@ -52,7 +51,7 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
     /**
      * Search Edit Box Edit
      */
-    private FavouriteNameRecycleViewAdapter nameRecycleViewAdapter;
+    private FavouriteNameRecycleViewAdapter mNameRecycleViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {/**/
@@ -159,15 +158,14 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
     /** */
     public void displayList(List<M_Name> name) {
         recyclerView = (RecyclerView) findViewById(R.id.rv_frequency_list);
-        recyclerView.addItemDecoration(new MarginDecoration(this,getResources().getDimensionPixelOffset(R.dimen.small_margin)));
+        recyclerView.addItemDecoration(new MarginDecoration(this, getResources().getDimensionPixelOffset(R.dimen.small_margin)));
 
         // ItemTouchHelper.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-
-        nameRecycleViewAdapter = new FavouriteNameRecycleViewAdapter(this, name);
-        recyclerView.setAdapter(nameRecycleViewAdapter);
+        mNameRecycleViewAdapter = new FavouriteNameRecycleViewAdapter(this, name,this);
+        recyclerView.setAdapter(mNameRecycleViewAdapter);
 
         setRecyclerViewLayoutManager();
     }
@@ -177,40 +175,38 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
      */
     private void setRecyclerViewLayoutManager() {
 
-        final SwipeToDismissTouchListener<RecyclerViewAdapter> touchListener =
-                new SwipeToDismissTouchListener<>(
-                        new RecyclerViewAdapter(recyclerView),
-                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewAdapter>() {
-                            @Override
-                            public boolean canDismiss(int position) {
-                                return true;
-                            }
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
-                            @Override
-                            public void onDismiss(RecyclerViewAdapter view, int position) {
-                                nameRecycleViewAdapter.remove(position);
-                            }
-                        });
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1) {
+                return false;
+            }
 
-        recyclerView.setOnTouchListener(touchListener);
-        // Setting this scroll listener is required to ensure that during ListView scrolling,
-        // we don't look for swipes.
-        recyclerView.setOnScrollListener((RecyclerView.OnScrollListener) touchListener.makeScrollListener());
-        recyclerView.addOnItemTouchListener(new SwipeableItemClickListener(this,
-                new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        if (view.getId() == R.id.txt_delete) {
-                            touchListener.processPendingDismisses();
-                        } else if (view.getId() == R.id.txt_undo) {
-                            touchListener.undoPendingDismiss();
-                        } else { // R.id.txt_data
-                            Toast.makeText(ActivityWishListDisplayName.this, "Position " + position, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }));
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+
+                mNameRecycleViewAdapter.remove(viewHolder.getLayoutPosition());
+                setupSnakBar();
+            }
+        };
 
 
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void setupSnakBar() {
+        final View.OnClickListener clickListener = new View.OnClickListener() {
+            public void onClick(View v) {
+                mNameRecycleViewAdapter.addUndo();
+            }
+        };
+
+        final View coordinatorLayoutView = findViewById(R.id.snackbarPosition);
+        Snackbar
+                .make(coordinatorLayoutView, R.string.msg_item_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.btn_undo, clickListener)
+                .show();
     }
 
     /** */
@@ -219,7 +215,7 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
         if (c != null && c.getCount() > 0) {
             c.moveToFirst();
             do {
-               //int id = c.getInt(c.getColumnIndex(TableContract.FavourateName.AUTO_ID));
+                //int id = c.getInt(c.getColumnIndex(TableContract.FavourateName.AUTO_ID));
                 int id = c.getInt(c.getColumnIndex(TableContract.FavourateName.NAME_ID));
 
                 String en = c.getString(c.getColumnIndex(TableContract.FavourateName.NAME_EN));
@@ -265,5 +261,11 @@ public class ActivityWishListDisplayName extends AppCompatActivity {
         if (dbHelper != null)
             dbHelper.close();
         super.onDestroy();
+    }
+
+    @Override
+    public void onRemove(int position) {
+        mNameRecycleViewAdapter.remove(position);
+        setupSnakBar();
     }
 }

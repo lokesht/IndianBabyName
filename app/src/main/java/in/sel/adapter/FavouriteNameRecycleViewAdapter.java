@@ -17,6 +17,7 @@ import java.util.List;
 import in.sel.anim.AnimationUtil;
 import in.sel.dbhelper.DBHelper;
 import in.sel.dbhelper.TableContract;
+import in.sel.framework.OnFavItemRemoveListener;
 import in.sel.indianbabyname.R;
 import in.sel.model.M_Name;
 import in.sel.utility.AppConstants;
@@ -24,15 +25,13 @@ import in.sel.utility.L;
 
 public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<FavouriteNameRecycleViewAdapter.MyViewHolder> {
 
-    //keep track of the previous position for animations where scrolling down requires a different animation compared to scrolling up
-    private int mPreviousPosition = 0;
-
     private List<M_Name> visibleObjects = Collections.emptyList();
     private LayoutInflater mInflater;
     private M_Name undoObject;
-
-    public FavouriteNameRecycleViewAdapter(Context context, List<M_Name> results) {
-
+    private OnFavItemRemoveListener onFavItemRemoveListener;
+private int mPreviousPos;
+    public FavouriteNameRecycleViewAdapter(Context context, List<M_Name> results, OnFavItemRemoveListener onFavItemRemoveListener) {
+        this.onFavItemRemoveListener = onFavItemRemoveListener;
         visibleObjects = new ArrayList<>(results);
         mInflater = LayoutInflater.from(context);
     }
@@ -74,13 +73,13 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
             holder.ivSmile.setImageResource(R.mipmap.ic_favorite_black_24dp);
 
 
-            /*** Animate Recycle View*/
-            if (position < mPreviousPosition) {
-                AnimationUtil.animateHeal(holder, false);
-            } else {
-                AnimationUtil.animateHeal(holder, true);
-            }
-            mPreviousPosition = position;
+//            /*** Animate Recycle View*/
+//            if (position < mPreviousPosition) {
+//                AnimationUtil.animateHeal(holder, false);
+//            } else {
+//                AnimationUtil.animateHeal(holder, true);
+//            }
+
         }
     }
 
@@ -106,10 +105,7 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
                 @Override
                 public void onClick(View v) {
 
-                    ivSmile.setImageResource(R.mipmap.ic_favorite_border_black_24dp);
-
-                    int position = getLayoutPosition();
-                    remove(position);
+                    onFavItemRemoveListener.onRemove(getLayoutPosition());
 
                 }
             });
@@ -118,7 +114,7 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
 
 
     public void remove(int position) {
-
+        mPreviousPos = position;
         undoObject = visibleObjects.get(position);
 
         DBHelper dbh = new DBHelper(mInflater.getContext());
@@ -131,18 +127,19 @@ public class FavouriteNameRecycleViewAdapter extends RecyclerView.Adapter<Favour
             dbh.close();
     }
 
-    private void addUndo(int position, M_Name name) {
+    public void addUndo() {
+
         DBHelper dbh = new DBHelper(mInflater.getContext());
         ContentValues cv = new ContentValues();
-        cv.put(TableContract.FavourateName.NAME_EN, name.getName_en());
-        cv.put(TableContract.FavourateName.NAME_MA, name.getName_ma());
-        cv.put(TableContract.FavourateName.NAME_FRE, name.getFrequency());
-        cv.put(TableContract.FavourateName.GENDER_CAST, name.getGender_cast());
-        cv.put(TableContract.FavourateName.NAME_ID, name.getId());
+        cv.put(TableContract.FavourateName.NAME_EN, undoObject.getName_en());
+        cv.put(TableContract.FavourateName.NAME_MA, undoObject.getName_ma());
+        cv.put(TableContract.FavourateName.NAME_FRE, undoObject.getFrequency());
+        cv.put(TableContract.FavourateName.GENDER_CAST, undoObject.getGender_cast());
+        cv.put(TableContract.FavourateName.NAME_ID, undoObject.getId());
 
         long tempId = dbh.insertInTable(TableContract.FavourateName.TABLE_NAME, null, cv);
-        visibleObjects.add(position, name);
-        notifyItemRemoved(position);
+        visibleObjects.add(mPreviousPos, undoObject);
+        notifyItemInserted(mPreviousPos);
 
         if (dbh != null)
             dbh.close();
