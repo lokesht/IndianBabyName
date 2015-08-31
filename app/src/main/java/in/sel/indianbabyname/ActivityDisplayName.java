@@ -33,6 +33,8 @@ import android.widget.TextView;
 
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,6 +102,11 @@ public class ActivityDisplayName extends AppCompatActivity {
     private FloatingActionButton mFabActionButton;
     private List<Integer> mWishList = new ArrayList<Integer>();
 
+    /**
+     * The {@link Tracker} used to record screen views.
+     */
+    private Tracker mTracker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {/**/
         super.onCreate(savedInstanceState);
@@ -119,6 +126,13 @@ public class ActivityDisplayName extends AppCompatActivity {
     }
 
     private void init() {
+
+        /*Including analytics*/
+        if (AnalyticsTrackers.getInstance() == null)
+            AnalyticsTrackers.initialize(this);
+
+        mTracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
+        /*End of Including analytics*/
 
         /* Default Object*/
         mSortingValueHolder = new SortingValueHolder();
@@ -366,6 +380,10 @@ public class ActivityDisplayName extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+
+                mTracker.setScreenName("Search" + s.toString());
+                mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+
                 query(s.toString());
             }
         });
@@ -414,6 +432,9 @@ public class ActivityDisplayName extends AppCompatActivity {
                 }
             });
         } else {
+
+                bgViewGroup.setVisibility(View.GONE);
+                viewContainer.setVisibility(View.VISIBLE);
 
         }
     }
@@ -625,7 +646,6 @@ public class ActivityDisplayName extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id) {
-
             case R.id.action_search:
                 showSearchBar(cardViewSearch, centerX, centerY);
                 break;
@@ -639,12 +659,6 @@ public class ActivityDisplayName extends AppCompatActivity {
         hideSearchBar(cardViewSearch);
     }
 
-    /**
-     * Search bar animation Constructer
-     */
-    private void showSearchBar(View myView) {
-        showSearchBar(myView, 0, 0);
-    }
 
     /**
      * Animate to show Search bar
@@ -730,53 +744,4 @@ public class ActivityDisplayName extends AppCompatActivity {
             super.onBackPressed();
         }
     }
-
-    //    @Override
-//    public void onClick(View v) {
-//        String where = "";
-//        Cursor c = null;
-//
-//        switch (v.getId()) {
-//            case R.id.tvFrequency:
-//
-//                /** This is will select only those which are not marked */
-//                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
-//                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_FRE + " DESC";
-//
-//                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
-//                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
-//                        TableContract.Name.GENDER_CAST}, where);
-//
-//
-//                break;
-//
-//            case R.id.tvEnglish:
-//
-//
-//                /** This is will select only those which are not marked */
-//                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
-//                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_EN + " ASC";
-//
-//                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
-//                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
-//                        TableContract.Name.GENDER_CAST}, where);
-//
-//
-//                break;
-//
-//            case R.id.tvHindi:
-//                /** This is will select only those which are not marked */
-//                where = TableContract.Name.NAME_EN + " like '" + selectedAlphabet + "%' AND " + TableContract.Name.GENDER_CAST
-//                        + " = ''" + " ORDER BY " + TableContract.Name.NAME_MA + " ASC";
-//
-//                c = dbHelper.getTableValue(TableContract.Name.TABLE_NAME, new String[]{TableContract.Name.AUTO_ID,
-//                        TableContract.Name.NAME_EN, TableContract.Name.NAME_MA, TableContract.Name.NAME_FRE,
-//                        TableContract.Name.GENDER_CAST}, where);
-//
-//
-//                break;
-//        }
-//
-//    }
-
 }

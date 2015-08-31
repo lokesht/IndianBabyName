@@ -50,5 +50,5 @@ It would be pleasure if any parent found it useful for their child Name.
     <string name="msg_item_removed">Item removed</string>
     <string name="label_Favourite">Favourite Name</string>
     <string name="label_About">About</string>
-
+    <string name="banner_ad_unit_id">ca-app-pub-5232385251947282/4783159457</string>
 </resources>

@@ -16,6 +16,11 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +52,11 @@ public class ActivityWishListDisplayName extends AppCompatActivity implements On
     private View viewContainer;
 
     /**
+     * The {@link Tracker} used to record screen views.
+     */
+    private Tracker mTracker;
+    private AdView mAdView;
+    /**
      * Search Edit Box Edit
      */
     private FavouriteNameRecycleViewAdapter mNameRecycleViewAdapter;
@@ -60,6 +70,12 @@ public class ActivityWishListDisplayName extends AppCompatActivity implements On
     }
 
     private void initialize() {
+
+        // Obtain the shared Tracker instance.
+        // AnalyticsTrackers application = (AnalyticsTrackers) getApplication();
+        if (AnalyticsTrackers.getInstance() == null)
+            AnalyticsTrackers.initialize(this);
+        mTracker = AnalyticsTrackers.getInstance().get(AnalyticsTrackers.Target.APP);
 
         setupWindowAnimations();
 
@@ -83,11 +99,10 @@ public class ActivityWishListDisplayName extends AppCompatActivity implements On
             displayList(lsName);
         }
 
-//        /** This will find all wishlist of User*/
-//        c = dbHelper.getTableValue(TableContract.FavourateName.TABLE_NAME, new String[]{
-//                TableContract.FavourateName.NAME_ID}, null);
-//        mWishList = parseWishList(c);
-
+        /*Integrating advertisement */
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     private void setupWindowAnimations() {
@@ -107,6 +122,10 @@ public class ActivityWishListDisplayName extends AppCompatActivity implements On
                     animateRevealShow(bgViewGroup);
                 }
             });
+        }else
+        {
+            bgViewGroup.setVisibility(View.GONE);
+            viewContainer.setVisibility(View.VISIBLE);
         }
     }
 
@@ -162,7 +181,7 @@ public class ActivityWishListDisplayName extends AppCompatActivity implements On
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        mNameRecycleViewAdapter = new FavouriteNameRecycleViewAdapter(this, name,this);
+        mNameRecycleViewAdapter = new FavouriteNameRecycleViewAdapter(this, name, this);
         recyclerView.setAdapter(mNameRecycleViewAdapter);
 
         setRecyclerViewLayoutManager();
@@ -182,6 +201,13 @@ public class ActivityWishListDisplayName extends AppCompatActivity implements On
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+
+                // [START custom_event]
+                mTracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Remove Name")
+                        .setAction("Share")
+                        .build());
+                // [END custom_event]
 
                 mNameRecycleViewAdapter.remove(viewHolder.getLayoutPosition());
                 setupSnakBar();
