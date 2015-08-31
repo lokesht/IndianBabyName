@@ -60,7 +60,7 @@
                     android:paddingRight="@dimen/default_padding"
                     android:paddingLeft="@dimen/default_padding">
 
-                    <TextView android:text="ABC" />
+                    <TextView android:text="MEENA" />
 
                     <TextView android:text=" मिना" />
 
@@ -71,7 +71,7 @@
                     android:paddingRight="@dimen/default_padding"
                     android:paddingLeft="@dimen/default_padding">
 
-                    <TextView android:text="ABC" />
+                    <TextView android:text="MEENA" />
 
                     <TextView android:text=" मीणा" />
 
@@ -82,7 +82,7 @@
                     android:paddingRight="@dimen/default_padding"
                     android:paddingLeft="@dimen/default_padding">
 
-                    <TextView android:text="ABC" />
+                    <TextView android:text="MEENA" />
 
                     <TextView android:text=" मिणा" />
 

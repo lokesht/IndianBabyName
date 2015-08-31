@@ -27,6 +27,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".ActivityAbout"
             android:label="@string/label_About"
             android:parentActivityName=".ActivityAlphabetMain" >
@@ -34,8 +35,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ActivityAlphabetMain" />
         </activity>
-        <activity android:name=".ActivityAlphabetMain" />
         <activity
+            android:screenOrientation="portrait"
+            android:name=".ActivityAlphabetMain" />
+        <activity
+            android:screenOrientation="portrait"
             android:name=".ActivityDisplayName"
             android:parentActivityName=".ActivityAlphabetMain"
             android:theme="@style/Transparent" >
@@ -44,6 +48,7 @@
                 android:value=".ActivityAlphabetMain" />
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".ActivityWishListDisplayName"
             android:label="@string/label_Favourite"
             android:parentActivityName=".ActivityAlphabetMain"

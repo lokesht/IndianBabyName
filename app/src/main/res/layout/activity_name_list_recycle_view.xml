@@ -120,7 +120,7 @@
             android:layout_alignParentBottom="true"
             fab:fab_plusIconColor="@color/half_black"
             android:tint="@color/White"
-            fab:fab_colorNormal="@color/Blue_dark"
+            fab:fab_colorNormal="@color/colorAccent_second"
             android:src="@mipmap/ic_filter_list_black_24dp"
             fab:fab_colorPressed="@color/white_pressed"
             android:layout_alignParentLeft="true"

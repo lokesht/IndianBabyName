@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/relative_container"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:padding="@dimen/activity_margin_horizontal" >
+    android:orientation="vertical">
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@color/Black" />
+    <ImageView
+        android:tint="@color/black_semi_transparent"
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:layout_height="match_parent"
+       android:scaleType="fitXY"
+        android:src="@drawable/splash_screen" />
 
     <ProgressBar
         android:id="@+id/progressbar_Horizontal"
@@ -22,4 +24,13 @@
         android:max="200"
         android:progress="20" />
 
-</LinearLayout>
+    <TextView
+        android:paddingBottom="@dimen/activity_margin_vertical"
+        android:textSize="25dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:textColor="@color/colorPrimaryLight"
+        android:text="Name, Which Define your child"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</FrameLayout>
