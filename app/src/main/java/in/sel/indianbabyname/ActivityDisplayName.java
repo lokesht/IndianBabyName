@@ -60,7 +60,7 @@ import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScrol
 /**
  * Class is designed for Developer For Marking of Name
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+
 public class ActivityDisplayName extends AppCompatActivity {
     private String TAG = getClass().getName();
 
@@ -433,8 +433,11 @@ public class ActivityDisplayName extends AppCompatActivity {
             });
         } else {
 
-                bgViewGroup.setVisibility(View.GONE);
-                viewContainer.setVisibility(View.VISIBLE);
+            /* Make all visible without animation*/
+            bgViewGroup.setVisibility(View.GONE);
+            viewContainer.setVisibility(View.VISIBLE);
+            appearFab();
+
 
         }
     }
@@ -668,30 +671,32 @@ public class ActivityDisplayName extends AppCompatActivity {
         myView.setVisibility(View.VISIBLE);
         isSearchOpen = true;
 
-        // get the center for the clipping circle
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // get the center for the clipping circle
 
-        if (cx == 0 || cy == 0) {
-            cx = (myView.getLeft() + myView.getRight());
-            cy = (myView.getTop() + myView.getBottom());
-        }
+            if (cx == 0 || cy == 0) {
+                cx = (myView.getLeft() + myView.getRight());
+                cy = (myView.getTop() + myView.getBottom());
+            }
 
-        // get the final radius for the clipping circle
-        int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
+            // get the final radius for the clipping circle
+            int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
 
-        // create the animator for this view (the start radius is zero)
-        Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
-        anim.addListener(new SimpleAnimationListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
+            // create the animator for this view (the start radius is zero)
+            Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
+            anim.addListener(new SimpleAnimationListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
 
 //                ObjectAnimator obj = ObjectAnimator.ofInt(viewBelowActionBar,"bottom",viewBelowActionBar.getBottom(),viewBelowActionBar.getTop());
 //                obj.start();
 //                super.onAnimationStart(animation);
-            }
-        });
+                }
+            });
 
 
-        anim.start();
+            anim.start();
+        }
     }
 
     /**
@@ -702,31 +707,37 @@ public class ActivityDisplayName extends AppCompatActivity {
         isSearchOpen = false;
         editText.setText("");
 
-        // get the center for the clipping circle
-        int cx = (myView.getLeft() + myView.getRight());
-        int cy = (myView.getTop() + myView.getBottom());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-        // get the final radius for the clipping circle
-        int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
+            // get the center for the clipping circle
+            int cx = (myView.getLeft() + myView.getRight());
+            int cy = (myView.getTop() + myView.getBottom());
 
-        // create the animator for this view (the start radius is zero)
-        Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, finalRadius, 0);
+            // get the final radius for the clipping circle
+            int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
 
-        // make the view visible and start the animation
-        anim.addListener(new AnimatorListenerAdapter() {
-            public void onAnimationStart(Animator animation) {
+            // create the animator for this view (the start radius is zero)
+            Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, finalRadius, 0);
+
+            // make the view visible and start the animation
+            anim.addListener(new AnimatorListenerAdapter() {
+                public void onAnimationStart(Animator animation) {
 //                ObjectAnimator obj = ObjectAnimator.ofInt(viewBelowActionBar, "bottom", viewBelowActionBar.getTop(), viewBelowActionBar.getBottom());
 //                obj.start();
 //                super.onAnimationStart(animation);
-            }
+                }
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                myView.setVisibility(View.INVISIBLE);
-            }
-        });
-        anim.start();
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    myView.setVisibility(View.INVISIBLE);
+                }
+            });
+            anim.start();
+        }else
+        {
+            myView.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

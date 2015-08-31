@@ -15,10 +15,7 @@ public class AppConstants {
 	 */
 	public static boolean DEBUG = false;
 
-	public static boolean DEVELOER = true;
-
-	/** It Will Decide Service Download For Module */
-	public static boolean IS_MODULE = false;
+	public static boolean DEVELOER = false;
 
 	/** It will give info whether service is running or not */
 	public static boolean IS_SERVICE_RUNNING = false;
