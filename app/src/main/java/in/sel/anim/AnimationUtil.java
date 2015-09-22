@@ -112,6 +112,7 @@ public class AnimationUtil {
         int holderHeight = holder.itemView.getHeight();
         holder.itemView.setPivotY(goesDown == true ? 0 : holderHeight);
         AnimatorSet animatorSet = new AnimatorSet();
+
         ObjectAnimator animatorTranslateY = ObjectAnimator.ofFloat(holder.itemView, "translationY", goesDown == true ? 300 : -300, 0);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(holder.itemView, "scaleY", 1f, 0.4f, 1f);
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(holder.itemView, "scaleX", 1f, 1.3f, 1f);
