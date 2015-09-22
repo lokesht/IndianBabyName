@@ -2,18 +2,19 @@ package in.sel.exception;
 
 public class ValueNotInsertedException extends Exception {
 	private static final long serialVersionUID = 1L;
-	String s = "";
+	String strException = "";
 
 	public ValueNotInsertedException() {
-		// s = "ValueNotInsertedException";
+		super();
 	}
 
-	public ValueNotInsertedException(String exc) {
-		s = exc;// + "ValueNotInsertedException";
+	public ValueNotInsertedException(String strException) {
+		super(strException);
+		this.strException = strException+" --> "+getClass().getName();
 	}
 
 	@Override
 	public String toString() {
-		return (s);
+		return (strException);
 	}
 }
